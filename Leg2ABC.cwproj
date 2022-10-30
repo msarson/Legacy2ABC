@@ -1,0 +1,43 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{57B192EA-C84C-4898-A667-867F6C8308DC}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Win32</Platform>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>Leg2ABC</AssemblyName>
+    <OutputName>Leg2ABC</OutputName>
+    <Model>Dll</Model>
+    <cpu>386</cpu>
+    <ApplicationIcon>Cwconv.ico</ApplicationIcon>
+    <DefineConstants>_ABCLinkMode_=&gt;0%3b_ABCDllMode_=&gt;1</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <vid>full</vid>
+    <check_stack>True</check_stack>
+    <check_index>True</check_index>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <vid>off</vid>
+    <check_stack>False</check_stack>
+    <check_index>False</check_index>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Cnveng.cwproj">
+      <Project>{1992ADB5-DF21-4A27-AEBB-9B5FEF3C3034}</Project>
+      <Name>Cnveng</Name>
+      <Generated>True</Generated>
+    </ProjectReference>
+    <ProjectReference Include="Cnvrules.cwproj">
+      <Project>{10AE9D84-020E-4339-A22C-B7E0F63484F4}</Project>
+      <Name>Cnvrules</Name>
+      <Generated>True</Generated>
+    </ProjectReference>
+    <Compile Include="Conv.clw" />
+    <None Include="C55CONV.INI" />
+  </ItemGroup>
+  <Import Project="$(ClarionBinPath)\SoftVelocity.Build.Clarion.targets" />
+</Project>

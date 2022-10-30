@@ -1,0 +1,46 @@
+
+  !Format of group is:
+
+  !Section Header
+  !Termination sections
+
+Terminators GROUP()
+Number        USHORT(18)
+              PSTRING('[APPLICATION]')
+              PSTRING('<<ALL>')
+              PSTRING('[ADDITION]')
+              PSTRING('[ADDITION][PERSIST][PROGRAM][PROCEDURE][CALLS][WINDOW][REPORT][FORMULA][MODULE]')
+              PSTRING('[FORMULA]')
+              PSTRING('<<HEADER>')
+              PSTRING('[SOURCE]')
+              PSTRING('<<HEADER>')
+              PSTRING('[EMBED]')
+              PSTRING('[ADDITION][PERSIST][PROGRAM][PROCEDURE][CALLS][WINDOW][REPORT][FORMULA]')
+              PSTRING('[PROMPTS]')
+              PSTRING('<<HEADER>')
+              PSTRING('[DATA]')
+              PSTRING('[FILES][PROMPTS][EMBED][ADDITION][PERSISTS][PROGRAM][PROCEDURE][CALLS][WINDOW][REPORT][FORMULA][MODULE]')
+              PSTRING('[WINDOW]')
+              PSTRING('<<HEADER>')
+              PSTRING('[COMMON]')
+              PSTRING('<<HEADER>')
+              PSTRING('[CALLS]')
+              PSTRING('<<HEADER>')
+              PSTRING('[PROCEDURE]')
+              PSTRING('[PROCEDURE][MODULE]')
+              PSTRING('[REPORT]')
+              PSTRING('<<HEADER>')
+              PSTRING('[MODULE]')
+              PSTRING('[MODULE]')
+              PSTRING('[PROGRAM]')
+              PSTRING('[MODULE]')
+              PSTRING('[FILES]')
+              PSTRING('[EMBED][ADDITION][DATA][FILES][CALLS][WINDOW][REPORT][FORMULA][END][PROCEDURE][PERSIST][PROGRAM][MODULE][PROJECT]')
+              PSTRING('[PERSIST]')
+              PSTRING('[PROGRAM][MODULE]')
+              PSTRING('[SECONDARY]')
+              PSTRING('<<HEADER>')
+              PSTRING('[PRIMARY]')
+              PSTRING('[OTHERS][PROMPTS][EMBED][ADDITION][CALLS][WINDOW][REPORT][FORMULA]')
+            END
+

@@ -1,0 +1,48 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{10AE9D84-020E-4339-A22C-B7E0F63484F4}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Win32</Platform>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Cnvrules</AssemblyName>
+    <OutputName>Cnvrules</OutputName>
+    <Model>Dll</Model>
+    <cpu>386</cpu>
+    <DefineConstants>maincode=&gt;off%3b_ABCLinkMode_=&gt;0%3b_ABCDllMode_=&gt;1</DefineConstants>
+    <stack_size>16384</stack_size>
+    <CopyCore>True</CopyCore>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <vid>full</vid>
+    <check_stack>True</check_stack>
+    <check_index>True</check_index>
+    <GenerateMap>True</GenerateMap>
+    <line_numbers>False</line_numbers>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <vid>off</vid>
+    <check_stack>False</check_stack>
+    <check_index>False</check_index>
+    <warnings>on</warnings>
+    <GenerateMap>True</GenerateMap>
+    <line_numbers>False</line_numbers>
+    <dynamic_base>True</dynamic_base>
+    <dep>True</dep>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Cnvrules.exp" />
+    <Compile Include="Cnvrules.clw" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Cnveng.cwproj">
+      <Project>{1992ADB5-DF21-4A27-AEBB-9B5FEF3C3034}</Project>
+      <Name>Cnveng</Name>
+      <Generated>True</Generated>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(ClarionBinPath)\SoftVelocity.Build.Clarion.targets" />
+</Project>
