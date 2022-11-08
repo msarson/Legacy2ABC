@@ -118,6 +118,7 @@ EngineStartup       PROCEDURE()
        ! DB.Init('Convertor')
         
         LocalError.Init(LocalErrorStatus)
+        LocalError.AddErrors(LocalErrors)
         IF GlobalErrors &= NULL
             GlobalErrors &= LocalError
         END

@@ -44,7 +44,7 @@ Number          USHORT(17)
                 USHORT(Msg:BadTXA)
                 BYTE(Level:Notify)
                 PSTRING('Invaild TXA File')
-                PSTRING('The input TXA file is invalid or has been damaged|')
+                PSTRING('The input TXA file is not [APPLICATION] type, is invalid or has been damaged|')  !Note: Not supported are Single [PROCEDURE] and [MODULE] TXA ... currently
                 USHORT(Msg:OutTXAWriteErr)
                 BYTE(Level:Notify)
                 PSTRING('TXA Write Error')
