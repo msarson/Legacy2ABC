@@ -7,6 +7,7 @@
 ! History 
 !-------------------------------------------------------------------------------------------------
 ! 2022-11-07  C. Barnes     Change Help HLP to CHM. All HLP('~xxx') added '.htm' to open CHM topic.
+! 2022-11-08  C. Barnes     Window Cosmetics - Change font to Microsoft Sans Serif - adjust controls
 !-------------------------------------------------------------------------------------------------
 
                     PROGRAM
@@ -162,7 +163,7 @@ SheetPage               USHORT(1)
 InfoText                QUEUE
                             STRING(64)
                         END
-Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wizard'),MAX,AT(,,421,214),CENTER,ICON('CWCONV.ICO'),FONT('MS Sans Serif', 8,, FONT:regular),GRAY,ALRT(MouseRight),PALETTE(256),IMM,RESIZE,HLP('~AppConv.htm')
+Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wizard'),MAX,AT(,,424,216),CENTER,ICON('CWCONV.ICO'),FONT('Microsoft Sans Serif', 8,, FONT:regular),GRAY,ALRT(MouseRight),PALETTE(256),IMM,RESIZE,HLP('~AppConv.htm')
                             PROGRESS, AT(76,199,151,13), USE(?ProgressBar), HIDE, RANGE(1,100)
                             STRING('x{23}'), AT(4,203,68,10), USE(?ProgressPrompt), HIDE, TRN, LEFT
                             IMAGE, AT(4,6,112,181), USE(?Image1), HIDE
@@ -182,10 +183,12 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
                                     STRING('Application Source and Destination Files'), AT(128,13), USE(?String9), FONT(, 8, COLOR:Navy, FONT:bold)
                                     PROMPT('&Source Application:'), AT(128,43), USE(?SourceAppPrompt)
                                     ENTRY(@S255), AT(208,40,188,12), USE(AppNameIn), UPR
-                                    BUTTON('...'), AT(399,40,14,14), USE(?LookupSourceAppFile), TIP('Lookup source application file')
-                                    PROMPT('&Destination Application:'), AT(128,65), USE(?DestAppPrompt)
+                                    BUTTON('...'), AT(400,39,14,14), USE(?LookupSourceAppFile), TIP('Lookup source APP or TXA file')
+                                    PROMPT('&Destination Application:'), AT(128,63), USE(?DestAppPrompt)
                                     ENTRY(@s255), AT(208,60,188,12), USE(AppNameOut), UPR
-                                    BUTTON('...'), AT(400,60,14,13), USE(?LookupDestAppFile), TIP('Lookup destination application file')
+                                    BUTTON('...'), AT(400,59,14,13), USE(?LookupDestAppFile), TIP('Lookup destination APP or TXA file')
+                                    PROMPT('You may choose to convert from an application (APP) or text application (TXA) file. And may output directly to another application file or just generate a new TXA file for later import. <13,10><13,10>NOTE: APP files require ClarionCL.exe from the EE edition.'), AT(128,86,284,46), |
+                                        USE(?Files:Prompt1), TRN                                    
                                 END
                                 TAB(''), USE(?Tab3), HLP('~WizTab3.htm')
                                     STRING('Application Conversion Options'), AT(128,13,284,10), USE(?String11), FONT(, 8, COLOR:Navy, FONT:bold)
@@ -233,6 +236,7 @@ TakeWindowEvent             PROCEDURE(),VIRTUAL,BYTE,PROC
                         END
 
     CODE
+        SYSTEM{PROP:VScrollPos}=TRUE    !Proportional Thumb on scrollbar
         ThisWindow.Run()
         FREE(OwnerMap)
         RETURN CHOOSE(Completed=True,LEVEL:Benign,LEVEL:Notify)
@@ -855,13 +859,13 @@ AllCheck                BYTE(False)
 EditStr                 CSTRING(MaxLineLen),AUTO
 EditStrBck              LIKE(EditStr),AUTO
 
-window                  WINDOW('Confirm Conversion'),AT(,,300,183),FONT('MS Sans Serif',8,,FONT:regular),IMM,HLP('~ConfirmWindow.htm'), |
+window                  WINDOW('Confirm Conversion'),AT(,,300,183),FONT('Microsoft Sans Serif',8,,FONT:regular),IMM,HLP('~ConfirmWindow.htm'), |
                             GRAY,MAX,RESIZE
-                            LIST,AT(2,0,146,103),USE(?InList),VSCROLL,COLOR(COLOR:White),FORMAT('23L(2)|~Line~L(1)@s5@E(00H,,00H,0FFFFH)255L(2)|*~Original Code:~L(1)S(255)@S255@'), |
-                                FROM(SecQMgr.InQ)
-                            LIST,AT(154,0,146,103),USE(?OutList),VSCROLL,COLOR(COLOR:White),ALRT(MouseLeft2),ALRT(MouseRight), |
+                            LIST,AT(2,2,146,103),USE(?InList),VSCROLL,COLOR(COLOR:White),FORMAT('23L(2)|~Line~L(1)@s5@E(00H,,00H,0FFFFH)255L(2)|*~Original Code:~L(1)S(255)@S255@'), |
+                                FROM(SecQMgr.InQ),FONT('Consolas')
+                            LIST,AT(154,2,146,103),USE(?OutList),VSCROLL,COLOR(COLOR:White),ALRT(MouseLeft2),ALRT(MouseRight), |
                                 ALRT(InsertKey),ALRT(DeleteKey),ALRT(F2Key),ALRT(Alt2),FORMAT('23L(2)|~Line~L(1)@s5@E(00H,,00H,0FFFFH)255L(2)|*~Suggested New Code:~L(1)S(255)@' &|
-                                'S255@'),FROM(SecQMgr.OutQ)
+                                'S255@'),FROM(SecQMgr.OutQ),FONT('Consolas')
                             LIST,AT(2,121,297,43),USE(?Notes),VSCROLL,FONT(,,COLOR:Navy,),COLOR(COLOR:White,COLOR:Navy,COLOR:Yellow), |
                                 FROM(Info.Q.TextLine),GRID(COLOR:White)
                             ENTRY(@s255),AT(264,0,33,12),USE(EditStr),HIDE,ALRT(EnterKey),ALRT(CtrlA),ALRT(MouseRight)
@@ -1116,9 +1120,9 @@ Save:OutAppName         CSTRING(File:MaxFilePath),AUTO
         Save:OutAppName = OutAppname
         DOSFileLookup.Init()
         CASE lType
-        OF 0
-            DOSFileLookup.SetMask(Translator.TranslateString('Application Files'),'*.APP')
-            DOSFileLookup.AddMask(Translator.TranslateString('Text Application Files'),'*.TXA')
+        OF 0        !LookupSourceAppFile
+            DOSFileLookup.SetMask(Translator.TranslateString('Text Application Files (*.TXA)'),'*.TXA')
+            DOSFileLookup.AddMask(Translator.TranslateString('Application Files (*.APP)'),'*.APP')
             DOSFileLookup.AddMask(Translator.TranslateString('All Files'),'*.*')
             DOSFileLookup.WindowTitle=Translator.TranslateString('Select Application')
             InAppName=DOSFileLookup.Ask(1)
@@ -1131,9 +1135,9 @@ Save:OutAppName         CSTRING(File:MaxFilePath),AUTO
                 OutAppName = FN.Path
                 ASSERT(InAppName NOT = OutAppName)
             END
-        OF 1
-            DOSFileLookup.SetMask(Translator.TranslateString('Application Files'),'*.APP')
-            DOSFileLookup.AddMask(Translator.TranslateString('Text Application Files'),'*.TXA')
+        OF 1        !LookupDestAppFile
+            DOSFileLookup.SetMask(Translator.TranslateString('Text Application Files (*.TXA)'),'*.TXA')
+            DOSFileLookup.AddMask(Translator.TranslateString('Application Files (*.APP)'),'*.APP')
             DOSFileLookup.WindowTitle=Translator.TranslateString('Select Destination Application')
             DOSFileLookup.Flags = FILE:Save
             OutAppName = DOSFileLookup.Ask(1)
@@ -1297,7 +1301,7 @@ FN                      LIKE(FNInfoType),AUTO
     CODE
         FN.Path = FullName
         FNSplit(FN.Path,FN.Drive,FN.Directory,FN.Name,FN.Extension)
-        RETURN UPPER(FN.Extension[2 : LEN(FN.Extension)])
+        RETURN UPPER(FN.Extension[2 : LEN(FN.Extension)])        
 
 GetTempPath         PROCEDURE()
 cTempPath               CSTRING(File:MaxFilePath),AUTO
@@ -2686,7 +2690,7 @@ i                               LONG,AUTO
  ! COMPILE('_END_',_DEBUG_)
 SectionClass.ViewOutStream  PROCEDURE()
 
-window                          WINDOW('Section Output Stream'),AT(,,260,215),FONT('MS Sans Serif',8,,FONT:regular),SYSTEM,GRAY, |
+window                          WINDOW('Section Output Stream'),AT(,,260,215),FONT('Microsoft Sans Serif',8,,FONT:regular),SYSTEM,GRAY, |
                                     DOUBLE
                                     LIST,AT(4,4,252,207),USE(?List1),VSCROLL,FROM(SELF.OutQ.Line)
                                 END
@@ -2884,7 +2888,7 @@ AddToken            ROUTINE
   !COMPILE('_END_',_DEBUG_)
 LexerClass.ViewTokens       PROCEDURE()
 
-window                          WINDOW('Lexer Token List'),AT(,,336,177),FONT('MS Sans Serif',8,,FONT:regular),SYSTEM,GRAY,DOUBLE
+window                          WINDOW('Lexer Token List'),AT(,,336,177),FONT('Microsoft Sans Serif',8,,FONT:regular),SYSTEM,GRAY,DOUBLE
                                     LIST,AT(4,4,328,168),USE(?TokenList),VSCROLL,FORMAT('259L(1)|~Token~L(2)S(80)@s255@33L(1)|~Nest Lvl~L(2)@n_3@20L(1)|~ChrPos~L(2)@n_5@'), |
                                         FROM(SELF.TokenList)
                                 END
