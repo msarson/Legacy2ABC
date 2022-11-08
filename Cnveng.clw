@@ -1301,7 +1301,7 @@ FN                      LIKE(FNInfoType),AUTO
     CODE
         FN.Path = FullName
         FNSplit(FN.Path,FN.Drive,FN.Directory,FN.Name,FN.Extension)
-        RETURN UPPER(FN.Extension[2 : LEN(FN.Extension)])        
+        RETURN UPPER(SUB(FN.Extension,2,LEN(FN.Extension)-1))
 
 GetTempPath         PROCEDURE()
 cTempPath               CSTRING(File:MaxFilePath),AUTO

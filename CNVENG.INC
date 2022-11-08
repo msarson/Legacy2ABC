@@ -55,8 +55,8 @@ FNInfoType          GROUP,TYPE
 Path                  CSTRING(File:MaxFilePath)
 Drive                 CSTRING(3)
 Directory             CSTRING(File:MaxFilePath)
-Name                  CSTRING(9)
-Extension             CSTRING(5)
+Name                  CSTRING(FILE:MaxFileName)
+Extension             CSTRING(32)
                     END
 
 AddinRecordType     GROUP,TYPE
