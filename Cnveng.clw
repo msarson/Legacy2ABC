@@ -3,6 +3,11 @@
 !Modified by RADFusion International, LLC for use in Clarion 7.x and beyond
 !Open sourced by kind permission of Robert Zaunere
 !In Memory of Russell Eggen
+!-------------------------------------------------------------------------------------------------
+! History 
+!-------------------------------------------------------------------------------------------------
+! 2022-11-07  C. Barnes     Change Help HLP to CHM. All HLP('~xxx') added '.htm' to open CHM topic.
+!-------------------------------------------------------------------------------------------------
 
                     PROGRAM
 
@@ -157,13 +162,13 @@ SheetPage               USHORT(1)
 InfoText                QUEUE
                             STRING(64)
                         END
-Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wizard'),MAX,AT(,,421,214),CENTER,ICON('CWCONV.ICO'),FONT('MS Sans Serif', 8,, FONT:regular),GRAY,ALRT(MouseRight),PALETTE(256),IMM,RESIZE
+Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wizard'),MAX,AT(,,421,214),CENTER,ICON('CWCONV.ICO'),FONT('MS Sans Serif', 8,, FONT:regular),GRAY,ALRT(MouseRight),PALETTE(256),IMM,RESIZE,HLP('~AppConv.htm')
                             PROGRESS, AT(76,199,151,13), USE(?ProgressBar), HIDE, RANGE(1,100)
                             STRING('x{23}'), AT(4,203,68,10), USE(?ProgressPrompt), HIDE, TRN, LEFT
                             IMAGE, AT(4,6,112,181), USE(?Image1), HIDE
                             PANEL, AT(124,25,289,2), USE(?Line1), BEVEL(0,0,0600H)
                             SHEET, AT(120,4,300,183), USE(SheetPage), WIZARD
-                                TAB(''), USE(?Tab1), HLP('~WizTab1')
+                                TAB(''), USE(?Tab1), HLP('~WizTab1.htm')
                                     PROMPT('Welcome to the Clarion to ABC Application Conversion Wizard'), AT(128,13), USE(?String1), |
                                         FONT(, 8, COLOR:Navy, FONT:bold)
                                     PROMPT('The wizard will guide you through the process of converting an existing C6 or C7 application to use the ABC templates and base classes.'), AT(128,34,284,22), |
@@ -173,7 +178,7 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
                                     PROMPT('You may choose to convert from an C6 application (APP) or text application (TXA) file from C6 or C7. And may output directly to another application file or just generate a new TXA file for later import. <13,10><13,10>NOTE: If using C7, TXA is your only option.'), AT(128,86,284,46), |
                                         USE(?Prompt6), TRN
                                 END
-                                TAB(''), USE(?Tab2), HLP('~WizTab2')
+                                TAB(''), USE(?Tab2), HLP('~WizTab2.htm')
                                     STRING('Application Source and Destination Files'), AT(128,13), USE(?String9), FONT(, 8, COLOR:Navy, FONT:bold)
                                     PROMPT('&Source Application:'), AT(128,43), USE(?SourceAppPrompt)
                                     ENTRY(@S255), AT(208,40,188,12), USE(AppNameIn), UPR
@@ -182,10 +187,10 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
                                     ENTRY(@s255), AT(208,60,188,12), USE(AppNameOut), UPR
                                     BUTTON('...'), AT(400,60,14,13), USE(?LookupDestAppFile), TIP('Lookup destination application file')
                                 END
-                                TAB(''), USE(?Tab3), HLP('~WizTab3')
+                                TAB(''), USE(?Tab3), HLP('~WizTab3.htm')
                                     STRING('Application Conversion Options'), AT(128,13,284,10), USE(?String11), FONT(, 8, COLOR:Navy, FONT:bold)
                                 END
-                                TAB(''), USE(?StartConversionTab), HLP('~WizStartConversionTab')
+                                TAB(''), USE(?StartConversionTab), HLP('~WizStartConversionTab.htm')
                                     STRING('Start Conversion Process'), AT(128,13,284,10), USE(?String12), FONT(, 8, COLOR:Navy, FONT:bold)
                                     PROMPT('Pressing Proceed below starts the conversion process by applying the conversion rules. If you selected Manual for any rule you will be prompted to confirm the rules suggested changes before they are applied.'), AT(128,34,287,26), |
                                         USE(?Prompt7), TRN
@@ -279,7 +284,7 @@ ButtonYPos              USHORT,AUTO
                 ADD(OwnerMap,OwnerMap.Owner)
                 ASSERT(~ERRORCODE())
                 CREATE(OwnerMap.TabId,CREATE:Tab,?SheetPage)
-                OwnerMap.TabId{PROP:Hlp} = '~WizRulesTab'
+                OwnerMap.TabId{PROP:Hlp} = '~WizRulesTab.htm'
                 CREATE(OwnerMap.ButtonId,CREATE:Button,?Tab3)
                 OwnerMap.ButtonId{PROP:Text} = OwnerMap.Owner
                 OwnerMap.ButtonId{PROP:Tip} = Translator.TranslateString('Configure the') & ' ' & OwnerMap.Owner & ' ' & Translator.TranslateString('rule family')
@@ -850,7 +855,7 @@ AllCheck                BYTE(False)
 EditStr                 CSTRING(MaxLineLen),AUTO
 EditStrBck              LIKE(EditStr),AUTO
 
-window                  WINDOW('Confirm Conversion'),AT(,,300,183),FONT('MS Sans Serif',8,,FONT:regular),IMM,HLP('~ConfirmWindow'), |
+window                  WINDOW('Confirm Conversion'),AT(,,300,183),FONT('MS Sans Serif',8,,FONT:regular),IMM,HLP('~ConfirmWindow.htm'), |
                             GRAY,MAX,RESIZE
                             LIST,AT(2,0,146,103),USE(?InList),VSCROLL,COLOR(COLOR:White),FORMAT('23L(2)|~Line~L(1)@s5@E(00H,,00H,0FFFFH)255L(2)|*~Original Code:~L(1)S(255)@S255@'), |
                                 FROM(SecQMgr.InQ)
@@ -1346,8 +1351,8 @@ INIStr                          CSTRING(File:MaxFilePath)
         IF ~INIStr THEN SELF.Update('RuleDLLs','1','CNVRULES.DLL').
         INIStr = SELF.TryFetch('Files','HelpFile')        !Configure help system
         IF UPPER(INIStr) <> 'OFF'
-            IF ~INIStr
-                INIStr = 'C55CONV.HLP'
+            IF ~INIStr OR UPPER(RIGHT(INIStr,4)) <> '.CHM' THEN     !2022-11-07 Carl Barnes: change HLP to CHM
+                INIStr = 'Legacy2ABC.chm'                           !2022-11-07 Carl Barnes: was 'C55CONV.HLP'
                 SELF.Update('Files','HelpFile',INIStr)
             END
             HELP(INIStr)
