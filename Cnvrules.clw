@@ -1155,7 +1155,8 @@ j                             USHORT,AUTO
     ELSIF SectionHeader='[CALLS]'
       DO ProcessCalls
     ELSE
-      ASSERT(False)
+      Message('UnLinkedProc.TakeSection did not handle SectionHeader=' & SectionHeader &'||Expected: [PROCEDURE] [SOURCE] [CALLS]','UnLinkedProc Rule')  !2022-11-09 Carl Barnes: Seeing ASSERT not shopwing any test so added message just in case
+      ASSERT(False,'UnLinkedProc.TakeSection did not handle SectionHeader=' & SectionHeader)
     END
   END
   RETURN Level:Benign
@@ -1315,19 +1316,24 @@ RepRoutine.TakeSection  PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STR
 cLine                     CSTRING(MaxLineLen),AUTO
 IsReport                  BYTE(False)
 i                         LONG,AUTO
-InsertLine                LONG,AUTO
+InsertLine                LONG(0)
 
   CODE
   SELF.Buttons=Action:Cancel+Action:Apply
-  Info.AddTitle('Report found without a Window Structure')
-  LOOP i=1 TO SectionMgr.GetLineCount()
-    SectionMgr.GetLine(i,cLine)
-    IF cLine='[CALLS]'
-      InsertLine=i-1
-      BREAK
-    END
-  END
-  ASSERT(InsertLine)          !All procedures will contain a [CALLS] section, this is enforced by the convertor engine
+  !2022-11-09 Carl Barnes: Change like ProcRoutine.TakeSection to deal with no [CALLS].
+  !                        Change to FIRST check if its a REPORT with no [Window], if not we are done and Return Benign
+  !                        Then find insert point and add [Window] 
+!----------------------------------------------------------  
+!  Info.AddTitle('Report found without a Window Structure')
+!  LOOP i=1 TO SectionMgr.GetLineCount()                     !2022-11-09 Carl Barnes: Moved this code down after we're sure its needed
+!    SectionMgr.GetLine(i,cLine)
+!    IF cLine='[CALLS]'
+!      InsertLine=i-1
+!      BREAK
+!    END
+!  END
+!  ASSERT(InsertLine)          !All procedures will contain a [CALLS] section, this is enforced by the convertor engine ... Carl FYI but not Selective Export to TXA
+
   LOOP i = 1 TO SectionMgr.GetLineCount()
     SectionMgr.GetLine(i,cLine)
     IF SUB(cLine,1,8) = '[WINDOW]'
@@ -1336,16 +1342,34 @@ InsertLine                LONG,AUTO
       IsReport=True
     END
   END
-  IF IsReport
-    SectionMgr.InsertLine('END',InsertLine)
-    SectionMgr.InsertLine('BUTTON(''Cancel''),AT(45,42,50,15),USE(?Progress:Cancel),#ORIG(?Progress:Cancel)',InsertLine)
-    SectionMgr.InsertLine('STRING(''''),AT(0,30,141,10),USE(?Progress:PctText),CENTER,#ORIG(?Progress:PctText)',InsertLine)
-    SectionMgr.InsertLine('STRING(''''),AT(0,3,141,10),USE(?Progress:UserString),CENTER,#ORIG(?Progress:UserString)',InsertLine)
-    SectionMgr.InsertLine('PROGRESS,USE(Progress:Thermometer),AT(15,15,111,12),RANGE(0,100),#ORIG(Progress:Thermometer)',InsertLine)
-    SectionMgr.InsertLine('ProgressWindow WINDOW(''Report Progress...''),AT(,,142,59),CENTER,TIMER(1),GRAY,DOUBLE',InsertLine,0)
-    SectionMgr.InsertLine('[WINDOW]',InsertLine,0)
-    Info.AddLine('Window structure added',InsertLine)
+  IF ~IsReport THEN RETURN Level:Benign.   !2022-11-09 Carl Barnes: Not a REPORT template so can stop rule processing. 
+
+  Info.AddTitle('Report found without a Window Structure')
+  LOOP i=1 TO SectionMgr.GetLineCount()
+    SectionMgr.GetLine(i,cLine)
+    IF cLine='[CALLS]'  |
+    OR cLine='[REPORT]' THEN              !2022-11-09 Carl Barnes: the [Window] comes before [Report] so this is a good spot to insert     
+      InsertLine=i-1
+      BREAK
+    END
   END
+
+  !Message('Found [CALLS] InsertLine = '& InsertLine &'|SectionMgr.GetLineCount()='& SectionMgr.GetLineCount() , 'ProcRoutine.TakeSection')
+  IF InsertLine=0 THEN                      !ASSERT(InsertLine) 
+     SectionMgr.AppendLine(' ')             !Append blank line to end to insert Window before 
+     InsertLine=SectionMgr.GetLineCount()   !This is my new blank line as insert point
+  END 
+
+  !Add Report [Window] in reverse order because inserting before [CALLS]
+  SectionMgr.InsertLine('END',InsertLine)
+  SectionMgr.InsertLine('BUTTON(''Cancel''),AT(45,42,50,15),USE(?Progress:Cancel),#ORIG(?Progress:Cancel)',InsertLine)
+  SectionMgr.InsertLine('STRING(''''),AT(0,30,141,10),USE(?Progress:PctText),CENTER,#ORIG(?Progress:PctText)',InsertLine)
+  SectionMgr.InsertLine('STRING(''''),AT(0,3,141,10),USE(?Progress:UserString),CENTER,#ORIG(?Progress:UserString)',InsertLine)
+  SectionMgr.InsertLine('PROGRESS,USE(Progress:Thermometer),AT(15,15,111,12),RANGE(0,100),#ORIG(Progress:Thermometer)',InsertLine)
+  SectionMgr.InsertLine('ProgressWindow WINDOW(''Report Progress...''),AT(,,142,59),CENTER,TIMER(1),GRAY,DOUBLE',InsertLine,0)
+  SectionMgr.InsertLine('[WINDOW]',InsertLine,0)
+  Info.AddLine('Window structure added',InsertLine)
+
   RETURN Level:Benign
 
 !--- Process Routine Checker -----
@@ -1364,15 +1388,24 @@ IsProcess                 BYTE(False)
 
   CODE
   SELF.Buttons=Action:Cancel+Action:Apply+Action:OmitCode+Action:UnCompile+Action:AssertFail
-  Info.AddTitle('Process found without a Window Structure')
-  LOOP i=1 TO SectionMgr.GetLineCount()
-    SectionMgr.GetLine(i,cLine)
-    IF cLine='[CALLS]'
-      InsertLine=i-1
-      BREAK
-    END
-  END
-  ASSERT(InsertLine)          !All procedures will contain a [CALLS] section, this is enforced by the convertor engine
+!2022-11-09 Carl Barnes:
+!           In short: Improve to 1st check if need this rule, then handle missing [CALLS] so not ASSERT and crash.
+!           This checks a Process template for missing a [Window] section. An old problem that I think not present since Cw20.
+!           Original code FIRST looked for insert point i.e. [CALLS] section which comes just before [WINDOW]. 
+!           The [CALLS] section is NOT present in a selective export [PROCEDURE] TXA so fails with ASSERT.
+!           Carl changed to FIRST check if it's a PROCESS Template, or has a [Window], so no problem can Return Benign
+!           Only it a PROCESS w/o [Window] look for [CALLS]. if not found add to end.
+!----------------------------------------------------------
+!  Info.AddTitle('Process found without a Window Structure')
+!  LOOP i=1 TO SectionMgr.GetLineCount()                    !2022-11-09 Carl Barnes: Moved this code down after we're sure its needed
+!    SectionMgr.GetLine(i,cLine)
+!    IF cLine='[CALLS]'
+!      InsertLine=i-1
+!      BREAK
+!    END
+!  END
+!  ASSERT(InsertLine) !All procedures will contain a [CALLS] section, this is enforced by the convertor engine ... Carl FYI but not Selective Export to TXA
+
   LOOP i = 1 TO SectionMgr.GetLineCount()
     SectionMgr.GetLine(i,cLine)
     IF SUB(cLine,1,8) = '[WINDOW]'
@@ -1381,7 +1414,22 @@ IsProcess                 BYTE(False)
       IsProcess=True
     END
   END
-  IF IsProcess
+  IF ~IsProcess THEN RETURN Level:Benign.   !2022-11-09 Carl Barnes: Not a PROCESS template so can stop rule processing. 
+
+  Info.AddTitle('Process found without a Window Structure')
+  LOOP i=1 TO SectionMgr.GetLineCount()
+    SectionMgr.GetLine(i,cLine)
+    IF cLine='[CALLS]'
+      InsertLine=i-1
+      BREAK
+    END
+  END
+  !Message('Found [CALLS] InsertLine = '& InsertLine &'|SectionMgr.GetLineCount()='& SectionMgr.GetLineCount() , 'ProcRoutine.TakeSection')
+  IF InsertLine=0 THEN                      !ASSERT(InsertLine) 
+     SectionMgr.AppendLine(' ')             !Append blank line to end to insert Window before 
+     InsertLine=SectionMgr.GetLineCount()   !This is my new blank line
+  END 
+  !Add Progress [Window] in reverse order because inserting before [CALLS] 
     SectionMgr.InsertLine('END',InsertLine)
     SectionMgr.InsertLine('BUTTON(''Cancel''),AT(45,42,50,15),USE(?Progress:Cancel),#ORIG(?Progress:Cancel)',InsertLine)
     SectionMgr.InsertLine('STRING(''''),AT(0,30,141,10),USE(?Progress:PctText),CENTER,#ORIG(?Progress:PctText)',Insertline)
@@ -1390,7 +1438,6 @@ IsProcess                 BYTE(False)
     SectionMgr.InsertLine('ProgressWindow WINDOW(''Progress...''),AT(,,142,59),CENTER,TIMER(1),GRAY,DOUBLE',Insertline,0)
     SectionMgr.InsertLine('[WINDOW]',Insertline,0)
     Info.AddLine('Window structure added',InsertLine)
-  END
   RETURN Level:Benign
 
 !-- Place use variables on report details -----------------
