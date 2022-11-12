@@ -10,9 +10,16 @@
 *.trn text eol=crlf
 *.exp text eol=crlf
 *.[Ii][Nn][Ii] text eol=crlf
+*.txa text eol=crlf
+*.[Tt][Xx][Aa] text eol=crlf
+
 
 # Denote all files that are truly binary and should not be modified.
 *.bmp binary
 *.[Bb][Mm][Pp] binary
 *.ico binary
 *.[Ii][Cc][Oo] binary
+*.app binary
+*.[Aa][Pp][Pp] binary
+*.dct binary
+*.[Dd][Cc][Tt] binary
