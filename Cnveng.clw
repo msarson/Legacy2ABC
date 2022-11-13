@@ -12,6 +12,9 @@
 
                     PROGRAM
 
+!  INCLUDE('CBWndPreview.INC'),ONCE      !https://github.com/CarlTBarnes/WindowPreview ... should be commented out on published work
+!WndPrvCls   CBWndPreviewClass           !Carl's class for Reflection of Windows, Queue, Class
+
     INCLUDE('CNVENG.INC'),ONCE
     INCLUDE('ABPOPUP.INC'),ONCE                              !PopupManager from TopSpeed's ABC's
     INCLUDE('ABRESIZE.INC'),ONCE                             !Window Resizer from TopSpeed's ABC's
@@ -45,6 +48,7 @@ API32_GetTempPath           PROCEDURE(LONG dwBuffer,*CSTRING lpszTempPath),LONG,
 GetDC                       PROCEDURE(HANDLE),HANDLE,PASCAL
 ReleaseDC                   PROCEDURE(HANDLE, HANDLE),SIGNED,PASCAL,PROC
 GetDeviceCaps               PROCEDURE(HANDLE, SIGNED),SIGNED,PASCAL
+OutputDebugString           PROCEDURE(*CSTRING DbgMsg),PASCAL,RAW,DLL(1),NAME('OutputDebugStringA')
                         END
 
 EngineShutDown          PROCEDURE()
@@ -67,7 +71,7 @@ SetProgressValue        PROCEDURE(ProgressManagerClass SELF,BYTE Value),PRIVATE
 TXAQSetLine             PROCEDURE(ApplicationClass SELF,LONG Idx),PRIVATE
 UserInterface           PROCEDURE(),BYTE,PRIVATE
 YieldCheck              PROCEDURE(),BYTE,PRIVATE
-
+DB                      PROCEDURE(STRING DebugMessage)  !OutputDebugString
                         INCLUDE('DDE.CLW'),ONCE                       !This won't work for C7 and later apps, must use TXA files
                     END
 
@@ -115,8 +119,8 @@ Version             STRING('7.00')
 EngineStartup       PROCEDURE()
     CODE
         SETCURSOR(CURSOR:Wait)
-       ! DB.Init('Convertor')
-        
+        DB('#{80}<13,10>EngineStartup '& FORMAT(CLOCK(),@t6))
+
         LocalError.Init(LocalErrorStatus)
         LocalError.AddErrors(LocalErrors)
         IF GlobalErrors &= NULL
@@ -211,6 +215,7 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
                             END
                             STRING('xxxx'), AT(4,188,416,10), USE(?PassString), HIDE, TRN
                             STRING('xxx'), AT(326,188,92,10), USE(?VersionString), TRN, RIGHT
+                            BUTTON('Set All...'), AT(120,198,46,15), USE(?SetAllRulesBtn),HIDE,TIP('Set All Conversion Rules <13,10>the same: None, Manual or Automatic')
                             BUTTON('<< &Back'), AT(230,198,46,15), USE(?Previous), DISABLE, TIP('Previous Page')
                             BUTTON('&Next  >'), AT(276,198,46,15), USE(?Next), DEFAULT, TIP('Next Page')
                             BUTTON('&Cancel'), AT(326,198,46,15), USE(?Cancel), TIP('Exit conversion wizard')
@@ -312,7 +317,13 @@ ButtonYPos              USHORT,AUTO
             Addins.TabFeq = OwnerMap.TabID
             DO AssignWindowSize
             OwnerMap.Combos += 1
+
+!Current window allows 2 columns x 9 = 18 rules. There are 17 rules already so room for just 1 more before Assert
+!TODO make Window Bigger so can at least have 3 columns x 9 = 27 rules.
+!Alternative change to a LIST with all the Rules so can be of any length and none of the tricky stuff
+            IF NOT (OwnerMap.Combos <= 18) THEN Message('User Interface ThisWindow.Init()||18 Maximum Rules Combos fit on the wizard tab.','CnvEng.clw').  !Carl Since Assert is failing show message. 
             ASSERT(OwnerMap.Combos <= 18)
+
             CREATE(PromptFeq + i - 1,CREATE:Prompt,OwnerMap.TabID)
             (PromptFeq + i - 1){PROP:Text} = Addins.Info.PromptText
             CREATE(ComboFeq + i - 1,CREATE:DropCombo,OwnerMap.TabID)
@@ -320,6 +331,10 @@ ButtonYPos              USHORT,AUTO
             (ComboFeq + i - 1){PROP:Drop} = 3
             (ComboFeq + i - 1){PROP:From} = CHOOSE(Addins.Info.AllowAuto,'None|Manual|Automatic','None|Manual')
             (ComboFeq + i - 1){PROP:Use} = ComboUse[i]
+            (ComboFeq + i - 1){PROP:Tip} ='Name: <9>'    & Addins.Info.Name & |        !22-11-11 Carl Barnes: Show a tip on each Drop List to help id the rule
+                                   '<13,10>Prompt: <9>'  & Addins.Info.PromptText & | 
+                                   '<13,10>Section: <9>' & Addins.Info.Sections & | 
+                                   '<13,10>Empty Sections: '& CHOOSE(~Addins.Info.EmptySections,'No','Yes') 
             ComboUse[i] =  'Automatic'
             
             !ComboUse[i]=INI.TryFetch('Selections',Addins.Info.Name)
@@ -472,6 +487,7 @@ Fnd                             BYTE(False)
             GET(OwnerMap,OwnerMap.ButtonId)
             ASSERT(~ERRORCODE())
             UNHIDE(OwnerMap.TabId)
+            UNHIDE(?SetAllRulesBtn)     !22-11-11 Carl Barnes: Show "Set All" Button to set every rule the same
             HIDE(?Tab1)
             HIDE(?Tab2)
             HIDE(?Tab3)
@@ -481,6 +497,8 @@ Fnd                             BYTE(False)
             SELECT(OwnerMap.TabID)
             ?Cancel{PROP:Text} = Translator.TranslateString('&Ok')
             ?Cancel{PROP:Tip} = Translator.TranslateString('Confirm rule setting Ok')
+        OF ?SetAllRulesBtn 
+            DO SetAllRulesBtnRtn    !22-11-11 Carl Barnes:
         OF ?Next
             DO ValidateSheet
             ChangedPage = True
@@ -506,6 +524,7 @@ Fnd                             BYTE(False)
         OF ?Cancel
             IF SheetPage > 5
                 HIDE(OwnerMap.TabID)
+                HIDE(?SetAllRulesBtn)     !22-11-11 Carl Barnes:
                 UNHIDE(?Tab1)
                 UNHIDE(?Tab2)
                 UNHIDE(?Tab3)
@@ -528,6 +547,23 @@ Fnd                             BYTE(False)
             IF ConfigAppNames(AppNameIn,AppNameOut,1) = LEVEL:Notify THEN DISPLAY(?AppNameOut).
         END
         RETURN PARENT.TakeAccepted()
+
+SetAllRulesBtnRtn ROUTINE   !22-11-11 Carl Barnes: TO make easier to develop allow change All Rules
+    DATA
+RuleHow BYTE
+    CODE
+    RuleHow=POPUP('None|Manual|Automatic')
+    IF ~RuleHow THEN EXIT.
+    DB('SetAllRulesBtnRtn Addins=' & RECORDS(Addins) &'   OwnerMap.Owner=' & OwnerMap.Owner  )
+    LOOP i = 1 TO RECORDS(Addins)
+         GET(Addins,i) 
+         DB('Addins #' & i &' - '& Addins.Info.PromptText &'  ComboUseIdx='& Addins.ComboUseIdx  &'  Visible='& Addins.ComboUseIdx{PROP:Visible} &' AddIn Owner='& Addins.Info.Owner   )
+         IF Addins.Info.Owner <> OwnerMap.Owner THEN CYCLE.     !These rules are not showing
+         IF ~Addins.Info.AllowAuto AND RuleHow=3 THEN CYCLE.
+         ComboUse[i] = CHOOSE(RuleHow,'None','Manual','Automatic')
+    END
+    DISPLAY     
+    EXIT
 
 UpdateOnNewPage     ROUTINE
     IF INRANGE(SheetPage,1,5) THEN ?Image1{PROP:Text} = GetBMPName(SheetPage).
@@ -566,7 +602,7 @@ ValidateSheet       ROUTINE
                 SELECT(?AppNameOut)
                 RETURN LEVEL:Notify
             END
-            IF FileExists(AppNameOut) AND MESSAGE(Translator.TranslateString('Destination file already exists.|Do you want to replace it?'),Translator.TranslateString('File Exists'),ICON:Question,BUTTON:Yes+BUTTON:No,BUTTON:No)=BUTTON:No
+            IF FileExists(AppNameOut) AND MESSAGE(Translator.TranslateString('Destination file already exists.|Do you want to replace it?'),Translator.TranslateString('File Exists'),ICON:Question,BUTTON:Yes+BUTTON:No,BUTTON:Yes)=BUTTON:No
                 RETURN LEVEL:Notify
             END
             INI.UpdateAppNames(AppNameIn,AppNameOut)
@@ -792,6 +828,7 @@ InsideSection   BYTE(False)
 
 ProcessSection      ROUTINE
     IF SecQMgr.GetLineCount() OR Addins.Info.EmptySections
+        DB('PerformConversion ProcessSection AddIn='& AddIns.Info.Owner &' - '& AddIns.Info.Name &'  ThisSection=' & ThisSection )  !2022-11-09 Carl Barnes: Leave in the Debug to help trace
         SectionResponse=Addins.Mgr.TakeSection(SecQMgr,InfoTextMgr,ThisSection)
 !TakeSection() Return values  ->  Level:Benign, commit changes in OutQ
 !                                 Level:Notify, commit changes in OutQ do not make any further passes
@@ -860,7 +897,7 @@ AllCheck                BYTE(False)
 EditStr                 CSTRING(MaxLineLen),AUTO
 EditStrBck              LIKE(EditStr),AUTO
 
-window                  WINDOW('Confirm Conversion'),AT(,,300,183),FONT('Microsoft Sans Serif',8,,FONT:regular),IMM,HLP('~ConfirmWindow.htm'), |
+window                  WINDOW('Confirm Conversion'),AT(,,302,185),FONT('Microsoft Sans Serif',10,,FONT:regular),IMM,HLP('~ConfirmWindow.htm'), |
                             GRAY,MAX,RESIZE
                             LIST,AT(2,2,146,103),USE(?InList),VSCROLL,COLOR(COLOR:White),FORMAT('23L(2)|~Line~L(1)@s5@E(00H,,00H,0FFFFH)255L(2)|*~Original Code:~L(1)S(255)@S255@'), |
                                 FROM(SecQMgr.InQ),FONT('Consolas')
@@ -1128,10 +1165,10 @@ Save:OutAppName         CSTRING(File:MaxFilePath),AUTO
             DOSFileLookup.WindowTitle=Translator.TranslateString('Select Application')
             InAppName=DOSFileLookup.Ask(1)
             IF InAppName
-                InAppName = SHORTPATH(InAppName)
+                InAppName = LONGPATH(InAppName)
                 FN.Path = CLIP(InAppName)
                 FNSplit(FN.Path,FN.Drive,FN.Directory,FN.Name,FN.Extension)
-                FN.Name = CHOOSE(FN.Name[LEN(FN.Name)] = '5',CLIP(SUB(FN.Name,1,7)) & 'X',CLIP(SUB(FN.Name,1,7)) & '5')
+                FN.Name = '2ABC_' & CLIP(FN.Name)  !Carl was: CHOOSE(FN.Name[LEN(FN.Name)] = '5',CLIP(SUB(FN.Name,1,7)) & 'X',CLIP(SUB(FN.Name,1,7)) & '5')
                 FNMerge(FN.Path,FN.Drive,FN.Directory,FN.Name,FN.Extension)
                 OutAppName = FN.Path
                 ASSERT(InAppName NOT = OutAppName)
@@ -1326,6 +1363,15 @@ YieldCnt                BYTE(1),STATIC
         YieldCnt += 1
         RETURN CHOOSE(YieldCnt%YieldGranularity = 0,True,False)
 
+!----------------------------------------
+DB   PROCEDURE(STRING xMessage)
+Prfx EQUATE('CnvEng: ')
+sz   CSTRING(SIZE(Prfx)+SIZE(xMessage)+3),AUTO
+  CODE 
+  sz = Prfx & CLIP(xMessage) & '<13,10>'
+  OutputDebugString(sz)
+  RETURN 
+
 !--- Class Methods ----------------------------------------------------------------------
 
 ConvertorINIClass.Init      PROCEDURE(ErrorClass E)
@@ -1389,8 +1435,10 @@ j                                       BYTE,AUTO
         LOOP i = 1 TO 255                     !Load and initialize all dll's listed in C55CONV.INI RuleDLLs section
             LOOP j = 1 TO 255
                 DllName = INI.TryFetchField('RuleDLLs',i,j)
-                IF ~DllName THEN BREAK.
+                IF ~DllName THEN BREAK. 
+! ASSERT(0,'BEFORE LoadLibrary(DllName) in ConvertorINIClass.LoadRuleDlls') !;  message('BEFORE LoadLibrary(DllName) LoadRuleDlls')  !Carl: This Assert shows text               
                 SELF.hInstances.Item = LoadLibrary(DllName)
+! ASSERT(0,'AFTER LoadLibrary(DllName) in ConvertorINIClass.LoadRuleDlls')   ;  message('AFTER LoadLibrary(DllName) LoadRuleDlls')   !Carl: This Assert is Blank, need to figure out why ???           
                 ASSERT(SELF.hInstances.Item)
                 ADD(SELF.hInstances)
                 ASSERT(~ERRORCODE())
@@ -1442,6 +1490,15 @@ RuleClass.Register  PROCEDURE(BYTE Priority,STRING Owner,STRING Descrip,STRING P
 RuleClass.TakeSection       PROCEDURE(SectionClass SecQMgr,InfoTextClass Info,STRING SectionHeader)
     CODE
         RETURN Level:Benign
+
+RuleClass.Trace PROCEDURE(STRING xMessage)  !2022-11-12 Carl Barnes: want way in Rule DLL to output debug
+Prfx EQUATE('RuleClass: ')
+sz   CSTRING(SIZE(Prfx)+SIZE(xMessage)+3),AUTO
+  CODE 
+  sz = Prfx & CLIP(xMessage) & '<13,10>'
+  OutputDebugString(sz)
+  RETURN 
+
 
 RuleClass.AfterConversion   PROCEDURE()
     CODE
@@ -1808,7 +1865,8 @@ cLine                   CSTRING(MaxLineLen),AUTO
             IF YieldCheck() THEN YIELD.
             IF KeyboardBreak() THEN RETURN LEVEL:Cancel.
             IF FirstLine AND SELF.Line
-                IF UPPER(SUB(SELF.Line,1,13)) <> '[APPLICATION]'
+                !IF UPPER(SUB(SELF.Line,1,13)) <> '[APPLICATION]'                                       !2022-11-09 Carl Barnes: Was limited to Entire APP TXA Export
+                IF ~INLIST(UPPER(SUB(SELF.Line,1,13)),'[APPLICATION]','[PROCEDURE]','[MODULE]') THEN    !2022-11-09 Carl Barnes: Allow 1 PROCEDURE or MODULE may not work with all rules
                     SELF.Close()
                     GlobalErrors.TakeError(Msg:BadTXA)
                     RETURN LEVEL:Notify
@@ -1847,7 +1905,7 @@ cLine                   CSTRING(MaxLineLen),AUTO
                 END
             END
             cLine = CLIP(SELF.Line)
-            IF cLine
+            IF True  !was: IF cLine        !22-11-09 Carl Barnes: Want Blank lines in output for TXA file compare
                 IF ~TXAQMgr.AppendLine(cLine) = LEVEL:Benign THEN BREAK.
             END
         END
@@ -1909,7 +1967,7 @@ cStr                            CSTRING(MaxLineLen+1),AUTO
             IF YieldCheck() THEN YIELD.
             Progress.Update(i)
             TXAQMgr.GetLine(i,cStr)
-            IF cStr
+            IF True  !was: IF cStr   !2022-11-12 Carl Barnes: Want Blank lines in output for TXA file compare
                 SELF.Line = cStr
                 IF SELF.Update() = LEVEL:Notify
                     DO CloseRemove
