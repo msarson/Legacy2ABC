@@ -1,0 +1,975 @@
+[PROCEDURE]
+NAME SelectClasses
+NOEXPORT
+[COMMON]
+DESCRIPTION 'Select a Classes Record'
+FROM Clarion Browse
+MODIFIED '2022/11/13' '17:25:05'
+[DATA]
+CurrentTab               STRING(80)
+!!> GUID('91a28cea-a18f-4ffe-acce-aa3ae7fbca30')
+LocalRequest             LONG
+!!> GUID('78a0ebff-cc33-4092-83d2-dc54b8419105')
+OriginalRequest          LONG
+!!> GUID('cc4b1df7-c2a8-4f3f-b519-248fa797f4f6')
+LocalResponse            LONG
+!!> GUID('54bd28d3-46d2-4f81-bf5b-22358d51ad8f')
+FilesOpened              LONG
+!!> GUID('351eacf8-0053-439e-9c5c-5b5c2aea9a22')
+WindowOpened             LONG
+!!> GUID('2fcd5de8-d9ec-418b-a52a-bc2c89dd2ba7')
+WindowInitialized        LONG
+!!> GUID('9e4121fc-8fe9-4dec-b94c-60d03f5b86f1')
+ForceRefresh             LONG
+!!> GUID('114cfeaf-4e79-4c4f-8e6e-7e3e269732ec')
+RecordFiltered           LONG
+!!> GUID('77f19ff1-4216-4436-816e-9fc89243f3dd')
+[SCREENCONTROLS]
+! ENTRY(@n-13),USE(LOC:DropThread)
+[REPORTCONTROLS]
+! STRING(@n-13),USE(LOC:DropThread)
+LOC:DropThread           LONG
+!!> GUID('3c4daad8-ae25-48f7-8f1a-2ae8e358541b'),PICTURE(@n-13)
+[SCREENCONTROLS]
+! ENTRY(@n-13),USE(LOC:DropControl)
+[REPORTCONTROLS]
+! STRING(@n-13),USE(LOC:DropControl)
+LOC:DropControl          LONG
+!!> GUID('75b05e44-3214-492a-8579-c128a993be83'),PICTURE(@n-13)
+[SCREENCONTROLS]
+! ENTRY(@n-13),USE(LOC:ThreadRef)
+[REPORTCONTROLS]
+! STRING(@n-13),USE(LOC:ThreadRef)
+LOC:ThreadRef            &LONG
+!!> GUID('b2557f88-31a8-49be-beb3-624d2ce6b901'),PICTURE(@n-13)
+[FILES]
+[PRIMARY]
+Classes
+[INSTANCE]
+1
+[KEY]
+CLA:KeyClassNumber
+[SECONDARY]
+Teachers Classes
+Courses Classes
+[PROMPTS]
+%ButtonAction DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('No Special Action')
+WHEN  ('?Browse:1') ('No Special Action')
+WHEN  ('?Help') ('No Special Action')
+
+%ButtonRunName DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('')
+WHEN  ('?Browse:1') ('')
+WHEN  ('?Help') ('')
+
+%ButtonRunParameters DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('')
+WHEN  ('?Browse:1') ('')
+WHEN  ('?Help') ('')
+
+%ButtonProcedure DEPEND %Control PROCEDURE TIMES 3
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+WHEN  ('?Help') ()
+
+%ButtonThread DEPEND %Control LONG TIMES 3
+WHEN  ('') (0)
+WHEN  ('?Browse:1') (0)
+WHEN  ('?Help') (0)
+
+%ButtonThreadStack DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('25000')
+WHEN  ('?Browse:1') ('25000')
+WHEN  ('?Help') ('25000')
+
+%ButtonParameters DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('')
+WHEN  ('?Browse:1') ('')
+WHEN  ('?Help') ('')
+
+%ButtonRequest DEPEND %Control DEFAULT TIMES 3
+WHEN  ('') ('None')
+WHEN  ('?Browse:1') ('None')
+WHEN  ('?Help') ('None')
+
+%PreLookupKey DEPEND %Control KEY TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%PreLookupField DEPEND %Control COMPONENT TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%PreLookupProcedure DEPEND %Control PROCEDURE TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%PostLookupKey DEPEND %Control KEY TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%PostLookupField DEPEND %Control COMPONENT TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%PostLookupProcedure DEPEND %Control PROCEDURE TIMES 2
+WHEN  ('') ()
+WHEN  ('?Browse:1') ()
+
+%ForceWindowRefresh DEPEND %Control LONG TIMES 2
+WHEN  ('') (0)
+WHEN  ('?Browse:1') (0)
+
+%ReturnValue FIELD  ()
+%WindowOperationMode DEFAULT  ('Use WINDOW setting')
+%INISaveWindow LONG  (1)
+%PostLookupDuringValidate DEPEND %Control LONG TIMES 2
+WHEN  ('') (1)
+WHEN  ('?Browse:1') (1)
+
+%CheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedAssignVariable DEPEND %CheckedAssigns FIELD TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%CheckedAssignValue DEPEND %CheckedAssigns DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%CheckedHides DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedControl DEPEND %CheckedHides DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%CheckedControlAction DEPEND %CheckedHides DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%UncheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+
+%UncheckedAssignVariable DEPEND %UncheckedAssigns FIELD TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%UncheckedAssignValue DEPEND %UncheckedAssigns DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%UnCheckedHides DEPEND %Control MULTI LONG TIMES 0
+
+%UnCheckedControl DEPEND %UnCheckedHides DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%UnCheckedControlAction DEPEND %UnCheckedHides DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%ProcedureDisableEnhanceFocus LONG  (0)
+%ProcedureUseEnterInsteadTabOverride LONG  (0)
+%WindowUseEnterInsteadTab LONG  (1)
+%ProcedureUseEnterInsteadTabExcludeListCombo LONG  (0)
+%ProcedureUseEnterInsteadTabEnableNextTabStop LONG  (0)
+%ProcedureUseEnterInsteadTabExcludeG LONG  (1)
+%WindowUseEnterInsteadTabExclude MULTI DEFAULT  ()
+%WindowStyles MULTI LONG  ()
+%WindowStyleFontName DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontNameVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontNameIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontSize DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontSizeVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontSizeIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontStyle DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontStyleVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontStyleIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontColor DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontCharSet DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundNormal DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundNormal DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleBackgroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundSelected DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundSelected DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleBackgroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStylePicture DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStylePictureVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStylePictureIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleOtherListboxes MULTI DEFAULT  ()
+%ProcedureAutoBindFields MULTI LONG  ()
+%ProcedureAutoBindField DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+
+%ProcedureAutoBindFieldTPL DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+
+%ProcedureAutoBindProcedures MULTI LONG  ()
+%ProcedureAutoBindProcedure DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+
+%ProcedureAutoBindProcedureTPL DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+
+%ProcedureAutoBindFieldsIgnored MULTI LONG  ()
+%ProcedureAutoBindFieldIgnored DEPEND %ProcedureAutoBindFieldsIgnored DEFAULT TIMES 0
+
+%ProcedureAutoBindProceduresIgnored MULTI LONG  ()
+%ProcedureAutoBindProcedureIgnored DEPEND %ProcedureAutoBindProceduresIgnored DEFAULT TIMES 0
+
+%ProcedureAutoBindValidToAddField LONG  (0)
+%ProcedureUserBindFields MULTI LONG  ()
+%ProcedureUserBindField DEPEND %ProcedureUserBindFields FIELD TIMES 0
+
+%ProcedureAutoBindFieldIgnore DEPEND %ProcedureAutoBindFields LONG TIMES 0
+
+%ProcedureUserBindProcedures MULTI LONG  ()
+%ProcedureUserBindProcedure DEPEND %ProcedureUserBindProcedures PROCEDURE TIMES 0
+
+%ProcedureAutoBindProcedureIgnore DEPEND %ProcedureAutoBindProcedures LONG TIMES 0
+
+%ProcedureUserBindExpressions MULTI LONG  ()
+%ProcedureUserBindExpressionName DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+
+%ProcedureUserBindExpression DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+
+%ButtonReturnValueAssignment DEPEND %Control FIELD TIMES 0
+
+%ButtonReturnValueReferenceAssign DEPEND %Control LONG TIMES 0
+
+%ButtonThreadParameters DEPEND %Control DEFAULT TIMES 0
+
+%ButtonThreadReturnValueAssignment DEPEND %Control FIELD TIMES 0
+
+%PreLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+
+%PostLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+
+%LookupAssign DEPEND %Control MULTI LONG TIMES 0
+
+%MoreTarget DEPEND %LookupAssign FIELD TIMES 0
+
+%MoreField DEPEND %LookupAssign DEFAULT TIMES 0
+
+%CheckedDisables DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedDisableControl DEPEND %CheckedDisables DEFAULT TIMES 0
+
+%CheckedDisableControlAction DEPEND %CheckedDisables DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%UnCheckedDisables DEPEND %Control MULTI LONG TIMES 0
+
+%UnCheckedDisableControl DEPEND %UnCheckedDisables DEFAULT TIMES 0
+
+%UnCheckedDisableControlAction DEPEND %UnCheckedDisables DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%ExtUITabIcon DEPEND %Control DEFAULT TIMES 0
+
+%ExtUITabStyleOverrideGlobal DEPEND %Control LONG TIMES 0
+
+%ExtUITabStyle DEPEND %Control DEFAULT TIMES 2
+WHEN  ('') ('Default')
+WHEN  ('?CurrentTab') ('Default')
+
+%ActiveImageEnable DEPEND %Control LONG TIMES 0
+
+%AIObjectName DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('AIBtn0')
+
+%AIEnableMimicControl DEPEND %Control LONG TIMES 1
+WHEN  ('') (1)
+
+%AIMimicControl DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('?Browse:1')
+
+%AIImgRound DEPEND %Control LONG TIMES 0
+
+%AIOverrideImg DEPEND %Control DEFAULT TIMES 0
+
+%AIOverrideImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIOverrideImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIDisableImg DEPEND %Control DEFAULT TIMES 0
+
+%AIDisableImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIDisableImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIHotImg DEPEND %Control DEFAULT TIMES 0
+
+%AIHotImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIHotImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIPressedImg DEPEND %Control DEFAULT TIMES 0
+
+%AIPressedImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIPressedImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorType DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('Off')
+
+%FieldGradientColorTypeVariable DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('')
+
+%FieldGradientColorTypeIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorFrom DEPEND %Control LONG TIMES 1
+WHEN  ('') (-1)
+
+%FieldGradientColorFromVariable DEPEND %Control DEFAULT TIMES 0
+
+%FieldGradientColorFromIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorTo DEPEND %Control LONG TIMES 1
+WHEN  ('') (-1)
+
+%FieldGradientColorToVariable DEPEND %Control DEFAULT TIMES 0
+
+%FieldGradientColorToIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+[EMBED]
+EMBED %ProcedureInitialize
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+!Setup inter-thread processes
+LOC:DropThread  = GLO:DropThread
+LOC:DropControl = GLO:DropControl
+LOC:ThreadRef &= GLO:ThreadRef
+[END]
+EMBED %WindowEventHandling
+[INSTANCES]
+WHEN 'CloseWindow'
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+!Flag thread closed
+LOC:ThreadRef = 0
+[END]
+[END]
+EMBED %ControlPreEventHandling
+[INSTANCES]
+WHEN '?Browse:1'
+[INSTANCES]
+WHEN 'Drag'
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+!Pass dragged data
+DO BRW1::NewSelection
+SETDROPID(FORMAT(CLA:ClassNumber,@P##-#####P))
+[END]
+[END]
+[END]
+EMBED %BrowseBoxDoubleClickHandler
+[INSTANCES]
+WHEN '1'
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+!Pass dragged data
+DO BRW1::NewSelection
+SETDROPID(FORMAT(CLA:ClassNumber,@P##-#####P))
+POST(EVENT:Drop,LOC:DropControl,LOC:DropThread)
+[END]
+[END]
+EMBED %EndOfFormatBrowse
+[INSTANCES]
+WHEN '1'
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 5000
+PROPERTY:END
+IF BRW1::CLA:RoomNumber > 555 THEN                      !Carl Test Rule
+   BRW1::TEA:LastName = '** '& BRW1::TEA:LastName
+END 
+[END]
+[END]
+[END]
+[ADDITION]
+NAME Clarion BrowseBox
+[INSTANCE]
+INSTANCE 1
+PROCPROP
+[PROMPTS]
+%EnableQuickScan LONG  (0)
+%LocatorType DEFAULT  ('Step')
+%OverrideDefaultLocator LONG  (0)
+%OverrideLocator DEFAULT  ('')
+%RecordFilter DEFAULT  ('')
+%RangeField COMPONENT  ()
+%RangeLimitType DEFAULT  ('')
+%RangeLimit FIELD  ()
+%RangeLow FIELD  ()
+%RangeHigh FIELD  ()
+%RangeFile FILE  ()
+%ScrollBehavior DEFAULT  ('Movable Thumb')
+%ScrollKeyDistribution DEFAULT  ('Runtime')
+%CustomKeyDistribution MULTI LONG  ()
+%KeyDistributionValue DEPEND %CustomKeyDistribution DEFAULT TIMES 0
+
+%ScrollAlpha LONG  (1)
+%ScrollNumeric LONG  (0)
+%ScrollAlt LONG  (0)
+%SortOrder MULTI LONG  (1, 2)
+%SortCondition DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('CHOICE(?CurrentTab) = 2')
+WHEN  (2) ('CHOICE(?CurrentTab) = 3')
+
+%SortKey DEPEND %SortOrder KEY TIMES 2
+WHEN  (1) (CLA:KeyCourseNumber)
+WHEN  (2) (CLA:KeyTeacherNumber)
+
+%SortLocatorType DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('Step')
+WHEN  (2) ('Step')
+
+%SortOverrideDefaultLocator DEPEND %SortOrder LONG TIMES 2
+WHEN  (1) (0)
+WHEN  (2) (0)
+
+%SortOverrideLocator DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('')
+WHEN  (2) ('')
+
+%SortRecordFilter DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('')
+WHEN  (2) ('')
+
+%SortRangeField DEPEND %SortOrder COMPONENT TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortRangeLimitType DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('')
+WHEN  (2) ('')
+
+%SortRangeLimit DEPEND %SortOrder FIELD TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortRangeLow DEPEND %SortOrder FIELD TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortRangeHigh DEPEND %SortOrder FIELD TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortRangeFile DEPEND %SortOrder FILE TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortScrollBehavior DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('Movable Thumb')
+WHEN  (2) ('Movable Thumb')
+
+%SortScrollKeyDistribution DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('Runtime')
+WHEN  (2) ('Runtime')
+
+%SortCustomKeyDistribution DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortKeyDistributionValue DEPEND %SortCustomKeyDistribution DEFAULT TIMES 2
+WHEN  (1)TIMES 0
+WHEN  (2)TIMES 0
+
+%SortScrollAlpha DEPEND %SortOrder LONG TIMES 2
+WHEN  (1) (1)
+WHEN  (2) (1)
+
+%SortScrollNumeric DEPEND %SortOrder LONG TIMES 2
+WHEN  (1) (0)
+WHEN  (2) (0)
+
+%SortScrollAlt DEPEND %SortOrder LONG TIMES 2
+WHEN  (1) (0)
+WHEN  (2) (0)
+
+%ResetFields MULTI LONG  ()
+%ResetField DEPEND %ResetFields FIELD TIMES 0
+
+%SortResetFields DEPEND %SortOrder MULTI LONG TIMES 2
+WHEN  (1) ()
+WHEN  (2) ()
+
+%SortResetField DEPEND %SortResetFields FIELD TIMES 1
+WHEN  (1)TIMES 0
+
+%HotFields MULTI LONG  ()
+%HotField DEPEND %HotFields FIELD TIMES 0
+
+%HotFieldBound DEPEND %HotFields LONG TIMES 0
+
+%ControlFieldForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 6
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('Tea:LastName') (-1)
+
+%ControlFieldBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 6
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('Tea:LastName') (-1)
+
+%ControlFieldForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 6
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('Tea:LastName') (-1)
+
+%ControlFieldBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 6
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('Tea:LastName') (-1)
+
+%ConditionalColors DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ()
+WHEN  ('CLA:RoomNumber') ()
+WHEN  ('CLA:ScheduledTime') ()
+WHEN  ('COU:Description') ()
+WHEN  ('Tea:LastName') ()
+
+%ColorCondition DEPEND %ConditionalColors DEFAULT TIMES 1
+WHEN  ('?Browse:1')TIMES 0
+
+%ConditionalControlFieldForegroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%ConditionalControlFieldBackgroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%ConditionalControlFieldForegroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%ConditionalControlFieldBackgroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 0
+
+%ControlFieldIcon DEPEND %Control DEPEND %ControlField DEFAULT TIMES 1
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('')
+WHEN  ('CLA:RoomNumber') ('')
+WHEN  ('CLA:ScheduledTime') ('')
+WHEN  ('COU:Description') ('')
+WHEN  ('Tea:LastName') ('')
+
+%ConditionalIcons DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ()
+WHEN  ('CLA:RoomNumber') ()
+WHEN  ('CLA:ScheduledTime') ()
+WHEN  ('COU:Description') ()
+WHEN  ('Tea:LastName') ()
+
+%IconCondition DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:1')TIMES 0
+
+%ConditionalControlFieldIcon DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:1')TIMES 0
+
+%BrowseTotals MULTI LONG  ()
+%BrowseTotalTarget DEPEND %BrowseTotals FIELD TIMES 0
+
+%BrowseTotalType DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalField DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalBasedOn DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalCondition DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%AcceptToolBarControl LONG  (1)
+%TableSchematicsDescription DEFAULT  ('')
+%InterLine DEFAULT  ('0')
+%FindDefaultAnywhere LONG  (0)
+%HigherKeys MULTI LONG  ()
+%HigherKey DEPEND %HigherKeys COMPONENT TIMES 0
+
+%HigherKeyField DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueType DEPEND %HigherKeys DEFAULT TIMES 0
+
+%HigherKeyValueVariable DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueFixed DEPEND %HigherKeys DEFAULT TIMES 0
+
+%AdditionalSortType DEFAULT  ('Manual')
+%AddSortFields DEFAULT  ('')
+%AddSortFieldsAssisted MULTI LONG  ()
+%AddSortFieldAssisted DEPEND %AddSortFieldsAssisted FIELD TIMES 0
+
+%AddSortFieldAssistedOrder DEPEND %AddSortFieldsAssisted DEFAULT TIMES 0
+
+%SortFindDefaultAnywhere DEPEND %SortOrder LONG TIMES 0
+
+%SortHigherKeys DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortHigherKey DEPEND %SortHigherKeys COMPONENT TIMES 0
+
+%SortHigherKeyField DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 1
+WHEN  (2)TIMES 0
+
+%SortHigherKeyValueType DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 1
+WHEN  (2)TIMES 0
+
+%SortHigherKeyValueVariable DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 0
+
+%SortHigherKeyValueFixed DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 0
+
+%SortAdditionalSortType DEPEND %SortOrder DEFAULT TIMES 2
+WHEN  (1) ('Manual')
+WHEN  (2) ('Manual')
+
+%SortAddSortFields DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortAddSortFieldsAssisted DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortAddSortFieldAssisted DEPEND %SortAddSortFieldsAssisted FIELD TIMES 0
+
+%SortAddSortFieldAssistedOrder DEPEND %SortAddSortFieldsAssisted DEFAULT TIMES 1
+WHEN  (2)TIMES 0
+
+%UseSameColorForAll LONG  (0)
+%ControlGreenBarColor DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (0)
+WHEN  ('CLA:RoomNumber') (0)
+WHEN  ('CLA:ScheduledTime') (0)
+WHEN  ('COU:Description') (0)
+WHEN  ('TEA:LastName') (0)
+
+%GreenBarOnForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOnBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOnForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOnBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOffForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOffBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOffForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%GreenBarOffBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (-1)
+WHEN  ('CLA:RoomNumber') (-1)
+WHEN  ('CLA:ScheduledTime') (-1)
+WHEN  ('COU:Description') (-1)
+WHEN  ('TEA:LastName') (-1)
+
+%AllControlGreenBarColor LONG  (0)
+%AllControlGreenBarColorAlternate LONG  (0)
+%AllControlFieldForegroundNormal LONG  (-1)
+%AllControlFieldBackgroundNormal LONG  (-1)
+%AllControlFieldForegroundSelected LONG  (-1)
+%AllControlFieldBackgroundSelected LONG  (-1)
+%ConditionalColorsAll MULTI LONG  ()
+%ColorConditionAll DEPEND %ConditionalColorsAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldForegroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldForegroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%AllGreenBarOnForegroundNormal LONG  (-1)
+%AllGreenBarOnBackgroundNormal LONG  (-1)
+%AllGreenBarOnForegroundSelected LONG  (-1)
+%AllGreenBarOnBackgroundSelected LONG  (-1)
+%AllGreenBarOffForegroundNormal LONG  (-1)
+%AllGreenBarOffBackgroundNormal LONG  (-1)
+%AllGreenBarOffForegroundSelected LONG  (-1)
+%AllGreenBarOffBackgroundSelected LONG  (-1)
+%ControlFieldIconIsNumber DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%ConditionalControlFieldIconIsNumber DEPEND %ConditionalIcons LONG TIMES 0
+
+%UseSameStyleForAll LONG  (0)
+%ControlGreenBarStyle DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') (0)
+WHEN  ('CLA:RoomNumber') (0)
+WHEN  ('CLA:ScheduledTime') (0)
+WHEN  ('COU:Description') (0)
+WHEN  ('TEA:LastName') (0)
+
+%GreenBarOnStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('Local List')
+WHEN  ('CLA:RoomNumber') ('Local List')
+WHEN  ('CLA:ScheduledTime') ('Local List')
+WHEN  ('COU:Description') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+
+%GreenBarOnStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('')
+WHEN  ('CLA:RoomNumber') ('')
+WHEN  ('CLA:ScheduledTime') ('')
+WHEN  ('COU:Description') ('')
+WHEN  ('TEA:LastName') ('')
+
+%GreenBarOnStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%GreenBarOffStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('Local List')
+WHEN  ('CLA:RoomNumber') ('Local List')
+WHEN  ('CLA:ScheduledTime') ('Local List')
+WHEN  ('COU:Description') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+
+%GreenBarOffStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('')
+WHEN  ('CLA:RoomNumber') ('')
+WHEN  ('CLA:ScheduledTime') ('')
+WHEN  ('COU:Description') ('')
+WHEN  ('TEA:LastName') ('')
+
+%GreenBarOffStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ControlFieldStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('Local List')
+WHEN  ('CLA:RoomNumber') ('Local List')
+WHEN  ('CLA:ScheduledTime') ('Local List')
+WHEN  ('COU:Description') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+
+%ControlFieldStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:1')TIMES 5
+WHEN  ('CLA:ClassNumber') ('')
+WHEN  ('CLA:RoomNumber') ('')
+WHEN  ('CLA:ScheduledTime') ('')
+WHEN  ('COU:Description') ('')
+WHEN  ('TEA:LastName') ('')
+
+%ControlFieldStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ConditionalStyles DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%StyleCondition DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%ConditionalControlFieldStyleType DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyleLocalList DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyle DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%AllControlGreenBarStyle LONG  (0)
+%AllControlGreenBarStyleAlternate LONG  (0)
+%AllControlFieldStyleType DEFAULT  ('Local List')
+%AllControlFieldStyleLocalList DEFAULT  ('')
+%AllControlFieldStyle DEFAULT  ('')
+%ConditionalStylesAll MULTI LONG  ()
+%StyleConditionAll DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleType DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleLocalList DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyle DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%AllGreenBarOnStyleType DEFAULT  ('Local List')
+%AllGreenBarOnStyleLocalList DEFAULT  ('')
+%AllGreenBarOnStyle DEFAULT  ('')
+%AllGreenBarOffStyleType DEFAULT  ('Local List')
+%AllGreenBarOffStyleLocalList DEFAULT  ('')
+%AllGreenBarOffStyle DEFAULT  ('')
+%ControlFieldTipField DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%BrowseAllTotalOnOff LONG  (1)
+%BrowseAllTotalOnOffCondition DEFAULT  ('')
+%DisableAutoSizeColumn LONG  (0)
+%DisableListFormatManager LONG  (0)
+%ListFormatManagerAllowPopupInEmptyList DEFAULT  ('Enable')
+%ListFormatManagerCheckType DEFAULT  ('Icon')
+%ListFormatManagerItemsSortBy DEFAULT  ('Alpha')
+%ListFormatManagerUseIdentificationTip DEFAULT  ('Enable')
+%ListFormatManagerSaveWindowPosition DEFAULT  ('Enable')
+%ListFormatManagerSortOrder LONG  (1)
+%ListFormatManagerMenuAppendSortOrder LONG  (1)
+%ListFormatManagerSave LONG  (1)
+%UseMRP LONG  (1)
+%AddPopUp MULTI LONG  ()
+%AddPopUpChoice DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpControl DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpAction DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpProcedure DEPEND %AddPopUp PROCEDURE TIMES 0
+
+%AddPopUpThreadProcedure DEPEND %AddPopUp LONG TIMES 0
+
+%AddPopUpThreadStack DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpText DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%TypeAddPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%OtherPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpDisable DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpSeparate DEPEND %AddPopUp LONG TIMES 0
+
+[WINDOW]
+QuickWindow WINDOW('Drag Class to Enroll in'),AT(,,189,191),FONT('MS Sans Serif',8,COLOR:Black), |
+          CENTER,GRAY,IMM,MDI,HLP('~SelectClasses'),SYSTEM
+          LIST,AT(8,30,172,142),USE(?Browse:1),HVSCROLL,DRAGID('Classes'),FORMAT('[52L(2)|M~' & |
+            'Class Number~@P##-#####P@120L(2)|M~Description~@S30@/52C(2)|M~Room~C(0)@n4' & |
+            '@80L(2)|M~Scheduled Time~@s20@80L(2)|M~Instructor~@S20@]|M'),FROM(Queue:Browse:1), |
+            IMM,MSG('Browsing Records'),#FIELDS(CLA:ClassNumber,COU:Description,CLA:RoomNumber, |
+            CLA:ScheduledTime,TEA:LastName),#ORIG(?List),#SEQ(1),#ORDINAL(1)
+          SHEET,AT(4,4,180,172),USE(?CurrentTab),#ORIG(CurrentTab),#ORDINAL(2)
+            TAB('by Class Number'),#ORDINAL(3)
+            END
+            TAB('by Course Number'),#ORDINAL(4)
+            END
+            TAB('by Teacher Number'),#ORDINAL(5)
+            END
+          END
+          BUTTON('Help'),AT(0,0,45,14),USE(?Help),HIDE,STD(STD:Help),#ORDINAL(6)
+        END
+

@@ -321,7 +321,8 @@ StartPos                  USHORT,AUTO
     SectionMgr.GetLine(i,cLine)
     IF SELF.SaveComment(cLine) AND SELF.PreFilterLine(cLine,'BRW|:Browse')
       IF SELF.WildInstring('BRW!::',cLine,StartPos,Length) AND ~INSTRING('VIEW:BROWSE',UPPER(cLine),1,1)                   !Trap usage of queue variables
-        IF StartPos >= 3 AND SUB(cLine,INSTRING('DO ',UPPER(cLine),1,3),3)
+!Carl:  IF StartPos >= 3 AND SUB(cLine,INSTRING('DO ',UPPER(cLine),1,3),3)                   !22-11-13 Carl: original was all wrong trying to reject DO Brw#::
+        IF StartPos >= 3 AND ~MATCH(UPPER(cLine[1 : StartPos]),'DO +B$',Match:Regular) THEN  !22-11-13 Carl: This RegEx rejects "DO Brw#::"
           IF INSTRING(SELF.CurrentEmbed(),InsideVirtuals,1,1)
             IF SELF.WildReplace(cLine,'BRW!::','SELF.Q.') THEN Info.AddLine('Queue variables inside VIRTUALs now accessed as SELF.Q.',i).
           ELSE
@@ -1360,7 +1361,7 @@ InsertLine                LONG(0)
      InsertLine=SectionMgr.GetLineCount()   !This is my new blank line as insert point
   END 
 
-  !Add Report [Window] in reverse order because inserting before [CALLS]
+  !Add Report [Window] in reverse order because inserting "before" [CALLS] or [REPORT]
   SectionMgr.InsertLine('END',InsertLine)
   SectionMgr.InsertLine('BUTTON(''Cancel''),AT(45,42,50,15),USE(?Progress:Cancel),#ORIG(?Progress:Cancel)',InsertLine)
   SectionMgr.InsertLine('STRING(''''),AT(0,30,141,10),USE(?Progress:PctText),CENTER,#ORIG(?Progress:PctText)',InsertLine)
