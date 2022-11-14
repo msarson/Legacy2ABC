@@ -1,0 +1,264 @@
+[PROCEDURE]
+NAME ProcessStudents
+NOEXPORT
+[COMMON]
+DESCRIPTION 'Process the Students File - Test for ABC Conversion'
+FROM Clarion Process
+CATEGORY 'Process'
+MODIFIED '2022/11/09' '11:47:33'
+[DATA]
+RejectRecord             LONG
+!!> GUID('e7311902-360e-4a56-805a-83493e73fb21'),SCOPE(1)
+LocalRequest             LONG
+!!> GUID('970d50ca-8280-4d79-aae3-62ff0dbfea5d'),SCOPE(1)
+OriginalRequest          LONG
+!!> GUID('a8904886-c8ea-435d-80cd-44ae6d2a5863'),SCOPE(1)
+LocalResponse            LONG
+!!> GUID('e6b969b4-45b2-44a1-83d8-2d9bc5bd0cdb'),SCOPE(1)
+FilesOpened              LONG
+!!> GUID('ce03b1b4-9dff-40ef-b02c-8112e21912a3'),SCOPE(1)
+WindowOpened             LONG
+!!> GUID('1210c5bd-24fa-40a0-9b8f-862df5aed979'),SCOPE(1)
+RecordsToProcess         LONG,AUTO
+!!> GUID('2bdb1932-6c5f-4996-827e-af97fca2dc7c'),SCOPE(1)
+RecordsProcessed         LONG,AUTO
+!!> GUID('d03468b6-e85d-45d7-bbe9-e7105529aabe'),SCOPE(1)
+RecordsPerCycle          LONG,AUTO
+!!> GUID('41acd002-f4fc-4eb9-aeac-3e5183dea88c'),SCOPE(1)
+RecordsThisCycle         LONG,AUTO
+!!> GUID('caa6fb36-e750-4bb8-98d3-518f95e639bd'),SCOPE(1)
+PercentProgress          BYTE
+!!> GUID('b7453483-2235-4f69-a72e-30c59144c360'),SCOPE(1)
+RecordStatus             BYTE,AUTO
+!!> GUID('b00d03d0-e47a-4a3e-a81b-f696b1971b9c'),SCOPE(1)
+WindowInitialized        LONG
+!!> GUID('3b5870a5-c06b-4259-863d-ef39645a562e'),SCOPE(1)
+ForceRefresh             LONG
+!!> GUID('d8c1e156-7423-4fd6-a24d-6d204a03d49c'),SCOPE(1)
+[FILES]
+[PRIMARY]
+Students
+[INSTANCE]
+0
+[KEY]
+STU:KeyStudentNumber
+[PROMPTS]
+%ButtonAction DEPEND %Control DEFAULT TIMES 0
+%ButtonRunName DEPEND %Control DEFAULT TIMES 0
+%ButtonRunParameters DEPEND %Control DEFAULT TIMES 0
+%ButtonProcedure DEPEND %Control PROCEDURE TIMES 0
+%ButtonThread DEPEND %Control LONG TIMES 0
+%ButtonThreadStack DEPEND %Control DEFAULT TIMES 0
+%ButtonParameters DEPEND %Control DEFAULT TIMES 0
+%ButtonRequest DEPEND %Control DEFAULT TIMES 0
+%PreLookupKey DEPEND %Control KEY TIMES 0
+%PreLookupField DEPEND %Control COMPONENT TIMES 0
+%PreLookupProcedure DEPEND %Control PROCEDURE TIMES 0
+%PostLookupKey DEPEND %Control KEY TIMES 0
+%PostLookupField DEPEND %Control COMPONENT TIMES 0
+%PostLookupProcedure DEPEND %Control PROCEDURE TIMES 0
+%ForceWindowRefresh DEPEND %Control LONG TIMES 0
+%ReturnValue FIELD  ()
+%WindowOperationMode DEFAULT  ('Use WINDOW setting')
+%INISaveWindow LONG  (1)
+%ProcedureDisableEnhanceFocus LONG  (0)
+%ProcedureUseEnterInsteadTabOverride LONG  (0)
+%WindowUseEnterInsteadTab LONG  (1)
+%ProcedureUseEnterInsteadTabExcludeListCombo LONG  (0)
+%ProcedureUseEnterInsteadTabEnableNextTabStop LONG  (0)
+%ProcedureUseEnterInsteadTabExcludeG LONG  (1)
+%WindowUseEnterInsteadTabExclude MULTI DEFAULT  ()
+%WindowStyles MULTI LONG  ()
+%WindowStyleFontName DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontNameVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontNameIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleFontSize DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontSizeVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontSizeIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleFontStyle DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontStyleVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontStyleIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleFontColor DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleFontCharSet DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleForegroundNormal DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleForegroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleForegroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleBackgroundNormal DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleBackgroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleBackgroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleForegroundSelected DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleForegroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleForegroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleBackgroundSelected DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleBackgroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStyleBackgroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStylePicture DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStylePictureVariable DEPEND %WindowStyles DEFAULT TIMES 0
+%WindowStylePictureIsVariable DEPEND %WindowStyles LONG TIMES 0
+%WindowStyleOtherListboxes MULTI DEFAULT  ()
+%ProcedureAutoBindFields MULTI LONG  ()
+%ProcedureAutoBindField DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+%ProcedureAutoBindFieldTPL DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+%ProcedureAutoBindProcedures MULTI LONG  ()
+%ProcedureAutoBindProcedure DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+%ProcedureAutoBindProcedureTPL DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+%ProcedureAutoBindFieldsIgnored MULTI LONG  ()
+%ProcedureAutoBindFieldIgnored DEPEND %ProcedureAutoBindFieldsIgnored DEFAULT TIMES 0
+%ProcedureAutoBindProceduresIgnored MULTI LONG  ()
+%ProcedureAutoBindProcedureIgnored DEPEND %ProcedureAutoBindProceduresIgnored DEFAULT TIMES 0
+%ProcedureAutoBindValidToAddField LONG  (1)
+%ProcedureUserBindFields MULTI LONG  ()
+%ProcedureUserBindField DEPEND %ProcedureUserBindFields FIELD TIMES 0
+%ProcedureAutoBindFieldIgnore DEPEND %ProcedureAutoBindFields LONG TIMES 0
+%ProcedureUserBindProcedures MULTI LONG  ()
+%ProcedureUserBindProcedure DEPEND %ProcedureUserBindProcedures PROCEDURE TIMES 0
+%ProcedureAutoBindProcedureIgnore DEPEND %ProcedureAutoBindProcedures LONG TIMES 0
+%ProcedureUserBindExpressions MULTI LONG  ()
+%ProcedureUserBindExpressionName DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+%ProcedureUserBindExpression DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+%ReportDataSource DEFAULT  ('File')
+%WindowMessage DEFAULT  ('')
+%ProcessAction DEFAULT  ('No record action')
+%RIProcessAction LONG  (0)
+%UseMRP LONG  (1)
+%EnableQuickScan LONG  (1)
+%RecordFilter DEFAULT  ('')
+%ApproxRecordCount DEFAULT  ('')
+%AdditionalSortType DEFAULT  ('Manual')
+%AddSortFields DEFAULT  ('')
+%AddSortFieldsAssisted MULTI LONG  ()
+%AddSortFieldAssisted DEPEND %AddSortFieldsAssisted FIELD TIMES 0
+%AddSortFieldAssistedOrder DEPEND %AddSortFieldsAssisted DEFAULT TIMES 0
+%AddConditionalSort MULTI LONG  ()
+%AddConditionalSortCondition DEPEND %AddConditionalSort DEFAULT TIMES 0
+%AddConditionalSortFieldsAssisted DEPEND %AddConditionalSort MULTI LONG TIMES 0
+%AddConditionalSortFieldAssisted DEPEND %AddConditionalSortFieldsAssisted FIELD TIMES 0
+%AddConditionalSortFieldAssistedOrder DEPEND %AddConditionalSortFieldsAssisted DEFAULT TIMES 0
+%AddSortDynamicNamed MULTI LONG  ()
+%AddSortFieldDinNameDescription DEPEND %AddSortDynamicNamed DEFAULT TIMES 0
+%AddSortFieldsDinName DEPEND %AddSortDynamicNamed MULTI LONG TIMES 0
+%AddSortFieldDinName DEPEND %AddSortFieldsDinName FIELD TIMES 0
+%AddSortFieldDinNameOrder DEPEND %AddSortFieldsDinName DEFAULT TIMES 0
+%AddSortFieldsDinSort MULTI LONG  ()
+%AddSortFieldDinSortDescription DEPEND %AddSortFieldsDinSort DEFAULT TIMES 0
+%AddSortFieldDinSort DEPEND %AddSortFieldsDinSort FIELD TIMES 0
+%AddSortFieldDinSortOrder DEPEND %AddSortFieldsDinSort DEFAULT TIMES 0
+%AdditionalSortWindowTitle DEFAULT  ('Select the Order')
+%AdditionalSortWindowMessage DEFAULT  ('Select the order to process the data.')
+%AdditionalSortWindowOkButtonText DEFAULT  ('&OK')
+%AdditionalSortWindowOkButtonIcon DEFAULT  ('SOK.ICO')
+%AdditionalSortWindowOkButtonCursor DEFAULT  ('')
+%AdditionalSortWindowOkButtonKeyCode DEFAULT  ('')
+%AdditionalSortWindowOkButtonMsg DEFAULT  ('Accept data and close the window')
+%AdditionalSortWindowOkButtonTip DEFAULT  ('Accept data and close the window')
+%AdditionalSortWindowOkButtonFlat LONG  (1)
+%AdditionalSortWindowOkButtonSkip LONG  (0)
+%AdditionalSortWindowOkButtonJustification DEFAULT  ('Left')
+%AdditionalSortWindowCancelButtonText DEFAULT  ('&Cancel')
+%AdditionalSortWindowCancelButtonIcon DEFAULT  ('SCANCEL.ICO')
+%AdditionalSortWindowCancelButtonCursor DEFAULT  ('')
+%AdditionalSortWindowCancelButtonKeyCode DEFAULT  ('')
+%AdditionalSortWindowCancelButtonMsg DEFAULT  ('Cancel operation')
+%AdditionalSortWindowCancelButtonTip DEFAULT  ('Cancel operation')
+%AdditionalSortWindowCancelButtonFlat LONG  (1)
+%AdditionalSortWindowCancelButtonSkip LONG  (0)
+%AdditionalSortWindowCancelButtonJustification DEFAULT  ('Left')
+%AdditionalSortWindowUpButtonText DEFAULT  ('')
+%AdditionalSortWindowUpButtonIcon DEFAULT  ('SUP.ICO')
+%AdditionalSortWindowUpButtonCursor DEFAULT  ('')
+%AdditionalSortWindowUpButtonKeyCode DEFAULT  ('')
+%AdditionalSortWindowUpButtonMsg DEFAULT  ('Move field up')
+%AdditionalSortWindowUpButtonTip DEFAULT  ('Move field up')
+%AdditionalSortWindowUpButtonFlat LONG  (1)
+%AdditionalSortWindowUpButtonSkip LONG  (0)
+%AdditionalSortWindowUpButtonJustification DEFAULT  ('Left')
+%AdditionalSortWindowDownButtonText DEFAULT  ('')
+%AdditionalSortWindowDownButtonIcon DEFAULT  ('SDOWN.ICO')
+%AdditionalSortWindowDownButtonCursor DEFAULT  ('')
+%AdditionalSortWindowDownButtonKeyCode DEFAULT  ('')
+%AdditionalSortWindowDownButtonMsg DEFAULT  ('Move field down')
+%AdditionalSortWindowDownButtonTip DEFAULT  ('Move field down')
+%AdditionalSortWindowDownButtonFlat LONG  (1)
+%AdditionalSortWindowDownButtonSkip LONG  (0)
+%AdditionalSortWindowDownButtonJustification DEFAULT  ('Left')
+%AdditionalSortWindowChOrdButtonText DEFAULT  ('')
+%AdditionalSortWindowChOrdButtonIcon DEFAULT  ('SCH-ORD.ICO')
+%AdditionalSortWindowChOrdButtonCursor DEFAULT  ('')
+%AdditionalSortWindowChOrdButtonKeyCode DEFAULT  ('')
+%AdditionalSortWindowChOrdButtonMsg DEFAULT  ('Change Order')
+%AdditionalSortWindowChOrdButtonTip DEFAULT  ('Change Order')
+%AdditionalSortWindowChOrdButtonFlat LONG  (1)
+%AdditionalSortWindowChOrdButtonSkip LONG  (0)
+%AdditionalSortWindowChOrdButtonJustification DEFAULT  ('Left')
+%RangeField COMPONENT  ()
+%HigherKeys MULTI LONG  ()
+%HigherKey DEPEND %HigherKeys COMPONENT TIMES 0
+%RangeLimitType DEFAULT  ('Current Value')
+%HigherKeyField DEPEND %HigherKeys FIELD TIMES 0
+%HigherKeyValueType DEPEND %HigherKeys DEFAULT TIMES 0
+%HigherKeyValueVariable DEPEND %HigherKeys FIELD TIMES 0
+%HigherKeyValueFixed DEPEND %HigherKeys DEFAULT TIMES 0
+%RangeLimit FIELD  ()
+%RangeLow FIELD  ()
+%RangeHigh FIELD  ()
+%RangeFile FILE  ()
+%HotFields MULTI LONG  ()
+%HotField DEPEND %HotFields FIELD TIMES 0
+%HotFieldBound DEPEND %HotFields LONG TIMES 0
+%ButtonReturnValueAssignment DEPEND %Control FIELD TIMES 0
+%ButtonReturnValueReferenceAssign DEPEND %Control LONG TIMES 0
+%ButtonThreadParameters DEPEND %Control DEFAULT TIMES 0
+%ButtonThreadReturnValueAssignment DEPEND %Control FIELD TIMES 0
+%PreLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+%PostLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+%PostLookupDuringValidate DEPEND %Control LONG TIMES 0
+%LookupAssign DEPEND %Control MULTI LONG TIMES 0
+%MoreTarget DEPEND %LookupAssign FIELD TIMES 0
+%MoreField DEPEND %LookupAssign DEFAULT TIMES 0
+%CheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+%CheckedAssignVariable DEPEND %CheckedAssigns FIELD TIMES 0
+%CheckedAssignValue DEPEND %CheckedAssigns DEFAULT TIMES 0
+%CheckedHides DEPEND %Control MULTI LONG TIMES 0
+%CheckedControl DEPEND %CheckedHides DEFAULT TIMES 0
+%CheckedControlAction DEPEND %CheckedHides DEFAULT TIMES 0
+%CheckedDisables DEPEND %Control MULTI LONG TIMES 0
+%CheckedDisableControl DEPEND %CheckedDisables DEFAULT TIMES 0
+%CheckedDisableControlAction DEPEND %CheckedDisables DEFAULT TIMES 0
+%UncheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+%UncheckedAssignVariable DEPEND %UncheckedAssigns FIELD TIMES 0
+%UncheckedAssignValue DEPEND %UncheckedAssigns DEFAULT TIMES 0
+%UnCheckedHides DEPEND %Control MULTI LONG TIMES 0
+%UnCheckedControl DEPEND %UnCheckedHides DEFAULT TIMES 0
+%UnCheckedControlAction DEPEND %UnCheckedHides DEFAULT TIMES 0
+%UnCheckedDisables DEPEND %Control MULTI LONG TIMES 0
+%UnCheckedDisableControl DEPEND %UnCheckedDisables DEFAULT TIMES 0
+%UnCheckedDisableControlAction DEPEND %UnCheckedDisables DEFAULT TIMES 0
+%ExtUITabIcon DEPEND %Control DEFAULT TIMES 0
+%ExtUITabStyleOverrideGlobal DEPEND %Control LONG TIMES 0
+%ExtUITabStyle DEPEND %Control DEFAULT TIMES 0
+%ActiveImageEnable DEPEND %Control LONG TIMES 0
+%AIObjectName DEPEND %Control DEFAULT TIMES 0
+%AIEnableMimicControl DEPEND %Control LONG TIMES 0
+%AIMimicControl DEPEND %Control DEFAULT TIMES 0
+%AIImgRound DEPEND %Control LONG TIMES 0
+%AIOverrideImg DEPEND %Control DEFAULT TIMES 0
+%AIOverrideImgVariable DEPEND %Control DEFAULT TIMES 0
+%AIOverrideImgIsVariable DEPEND %Control LONG TIMES 0
+%AIDisableImg DEPEND %Control DEFAULT TIMES 0
+%AIDisableImgVariable DEPEND %Control DEFAULT TIMES 0
+%AIDisableImgIsVariable DEPEND %Control LONG TIMES 0
+%AIHotImg DEPEND %Control DEFAULT TIMES 0
+%AIHotImgVariable DEPEND %Control DEFAULT TIMES 0
+%AIHotImgIsVariable DEPEND %Control LONG TIMES 0
+%AIPressedImg DEPEND %Control DEFAULT TIMES 0
+%AIPressedImgVariable DEPEND %Control DEFAULT TIMES 0
+%AIPressedImgIsVariable DEPEND %Control LONG TIMES 0
+%FieldGradientColorType DEPEND %Control DEFAULT TIMES 0
+%FieldGradientColorTypeVariable DEPEND %Control DEFAULT TIMES 0
+%FieldGradientColorTypeIsVariable DEPEND %Control LONG TIMES 0
+%FieldGradientColorFrom DEPEND %Control LONG TIMES 0
+%FieldGradientColorFromVariable DEPEND %Control DEFAULT TIMES 0
+%FieldGradientColorFromIsVariable DEPEND %Control LONG TIMES 0
+%FieldGradientColorTo DEPEND %Control LONG TIMES 0
+%FieldGradientColorToVariable DEPEND %Control DEFAULT TIMES 0
+%FieldGradientColorToIsVariable DEPEND %Control LONG TIMES 0

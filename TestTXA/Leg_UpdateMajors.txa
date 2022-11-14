@@ -1,0 +1,3101 @@
+[PROCEDURE]
+NAME UpdateMajors
+NOEXPORT
+[COMMON]
+DESCRIPTION 'Update the Majors File'
+FROM Clarion Form
+MODIFIED '2021/03/15' '19:25:56'
+[DATA]
+CurrentTab               STRING(80)
+!!> GUID('3dc3e111-f275-43f9-8ea9-bed721e0a1ff')
+LocalRequest             LONG
+!!> GUID('5587bbeb-86f3-4ded-8bd1-862de3c014b7')
+OriginalRequest          LONG
+!!> GUID('7d8a665d-2f12-4a36-80cf-fc59e5a4068f')
+LocalResponse            LONG
+!!> GUID('52aa6e01-0c2a-441c-88af-e084a2e9a918')
+FilesOpened              LONG
+!!> GUID('fe5d0b46-95da-4256-85d6-6d545aec7072')
+WindowOpened             LONG
+!!> GUID('a8dcc33b-d3c4-4bee-87bc-4ff40e595327')
+WindowInitialized        LONG
+!!> GUID('67fd8c6b-a558-43eb-90d6-16e2c98b9fe4')
+ForceRefresh             LONG
+!!> GUID('8f20a9d4-4c67-429e-98e8-cb01df4d5f20')
+RecordFiltered           LONG
+!!> GUID('bfe1a0ef-2c5c-4e6d-ad6a-5ced73e0599b')
+ActionMessage            CSTRING(40)
+!!> GUID('e09ff4df-82af-4de9-9087-b59f7ed6c5a1')
+RecordChanged            BYTE,AUTO
+!!> GUID('4372e879-1b6c-4771-80a1-68f4e46a756c')
+[FILES]
+[PRIMARY]
+Teachers
+[INSTANCE]
+2
+[KEY]
+TEA:KeyDepartment
+[PRIMARY]
+Students
+[INSTANCE]
+4
+[KEY]
+STU:MajorKey
+[PRIMARY]
+Majors
+[INSTANCE]
+6
+[OTHERS]
+Majors
+[PROMPTS]
+%ButtonAction DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('No Special Action')
+WHEN  ('?Cancel') ('No Special Action')
+WHEN  ('?Change:3') ('No Special Action')
+WHEN  ('?Change:5') ('No Special Action')
+WHEN  ('?Delete:3') ('No Special Action')
+WHEN  ('?Delete:5') ('No Special Action')
+WHEN  ('?Help') ('No Special Action')
+WHEN  ('?Insert:3') ('No Special Action')
+WHEN  ('?Insert:5') ('No Special Action')
+WHEN  ('?OK') ('No Special Action')
+WHEN  ('?TeachersTab') ('No Special Action')
+
+%ButtonRunName DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('')
+WHEN  ('?Cancel') ('')
+WHEN  ('?Change:3') ('')
+WHEN  ('?Change:5') ('')
+WHEN  ('?Delete:3') ('')
+WHEN  ('?Delete:5') ('')
+WHEN  ('?Help') ('')
+WHEN  ('?Insert:3') ('')
+WHEN  ('?Insert:5') ('')
+WHEN  ('?OK') ('')
+WHEN  ('?TeachersTab') ('')
+
+%ButtonRunParameters DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('')
+WHEN  ('?Cancel') ('')
+WHEN  ('?Change:3') ('')
+WHEN  ('?Change:5') ('')
+WHEN  ('?Delete:3') ('')
+WHEN  ('?Delete:5') ('')
+WHEN  ('?Help') ('')
+WHEN  ('?Insert:3') ('')
+WHEN  ('?Insert:5') ('')
+WHEN  ('?OK') ('')
+WHEN  ('?TeachersTab') ('')
+
+%ButtonProcedure DEPEND %Control PROCEDURE TIMES 11
+WHEN  ('') ()
+WHEN  ('?Cancel') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Help') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?OK') ()
+WHEN  ('?TeachersTab') ()
+
+%ButtonThread DEPEND %Control LONG TIMES 11
+WHEN  ('') (0)
+WHEN  ('?Cancel') (0)
+WHEN  ('?Change:3') (0)
+WHEN  ('?Change:5') (0)
+WHEN  ('?Delete:3') (0)
+WHEN  ('?Delete:5') (0)
+WHEN  ('?Help') (0)
+WHEN  ('?Insert:3') (0)
+WHEN  ('?Insert:5') (0)
+WHEN  ('?OK') (0)
+WHEN  ('?TeachersTab') (0)
+
+%ButtonThreadStack DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('25000')
+WHEN  ('?Cancel') ('25000')
+WHEN  ('?Change:3') ('25000')
+WHEN  ('?Change:5') ('25000')
+WHEN  ('?Delete:3') ('25000')
+WHEN  ('?Delete:5') ('25000')
+WHEN  ('?Help') ('25000')
+WHEN  ('?Insert:3') ('25000')
+WHEN  ('?Insert:5') ('25000')
+WHEN  ('?OK') ('25000')
+WHEN  ('?TeachersTab') ('25000')
+
+%ButtonParameters DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('')
+WHEN  ('?Cancel') ('')
+WHEN  ('?Change:3') ('')
+WHEN  ('?Change:5') ('')
+WHEN  ('?Delete:3') ('')
+WHEN  ('?Delete:5') ('')
+WHEN  ('?Help') ('')
+WHEN  ('?Insert:3') ('')
+WHEN  ('?Insert:5') ('')
+WHEN  ('?OK') ('')
+WHEN  ('?TeachersTab') ('')
+
+%ButtonRequest DEPEND %Control DEFAULT TIMES 11
+WHEN  ('') ('None')
+WHEN  ('?Cancel') ('None')
+WHEN  ('?Change:3') ('None')
+WHEN  ('?Change:5') ('None')
+WHEN  ('?Delete:3') ('None')
+WHEN  ('?Delete:5') ('None')
+WHEN  ('?Help') ('None')
+WHEN  ('?Insert:3') ('None')
+WHEN  ('?Insert:5') ('None')
+WHEN  ('?OK') ('None')
+WHEN  ('?TeachersTab') ('None')
+
+%PreLookupKey DEPEND %Control KEY TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%PreLookupField DEPEND %Control COMPONENT TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%PreLookupProcedure DEPEND %Control PROCEDURE TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%PostLookupKey DEPEND %Control KEY TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%PostLookupField DEPEND %Control COMPONENT TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%PostLookupProcedure DEPEND %Control PROCEDURE TIMES 9
+WHEN  ('') ()
+WHEN  ('?Change:3') ()
+WHEN  ('?Change:5') ()
+WHEN  ('?Delete:3') ()
+WHEN  ('?Delete:5') ()
+WHEN  ('?Insert:3') ()
+WHEN  ('?Insert:5') ()
+WHEN  ('?MAJ:Description') ()
+WHEN  ('?TeachersTab') ()
+
+%ForceWindowRefresh DEPEND %Control LONG TIMES 9
+WHEN  ('') (0)
+WHEN  ('?Change:3') (0)
+WHEN  ('?Change:5') (0)
+WHEN  ('?Delete:3') (0)
+WHEN  ('?Delete:5') (0)
+WHEN  ('?Insert:3') (0)
+WHEN  ('?Insert:5') (0)
+WHEN  ('?MAJ:Description') (0)
+WHEN  ('?TeachersTab') (0)
+
+%ReturnValue FIELD  ()
+%WindowOperationMode DEFAULT  ('Use WINDOW setting')
+%INISaveWindow LONG  (1)
+%PostLookupDuringValidate DEPEND %Control LONG TIMES 9
+WHEN  ('') (1)
+WHEN  ('?Change:3') (1)
+WHEN  ('?Change:5') (1)
+WHEN  ('?Delete:3') (1)
+WHEN  ('?Delete:5') (1)
+WHEN  ('?Insert:3') (1)
+WHEN  ('?Insert:5') (1)
+WHEN  ('?MAJ:Description') (1)
+WHEN  ('?TeachersTab') (1)
+
+%CheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedAssignVariable DEPEND %CheckedAssigns FIELD TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%CheckedAssignValue DEPEND %CheckedAssigns DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%CheckedHides DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedControl DEPEND %CheckedHides DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%CheckedControlAction DEPEND %CheckedHides DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%UncheckedAssigns DEPEND %Control MULTI LONG TIMES 0
+
+%UncheckedAssignVariable DEPEND %UncheckedAssigns FIELD TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%UncheckedAssignValue DEPEND %UncheckedAssigns DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%UnCheckedHides DEPEND %Control MULTI LONG TIMES 0
+
+%UnCheckedControl DEPEND %UnCheckedHides DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%UnCheckedControlAction DEPEND %UnCheckedHides DEFAULT TIMES 8
+WHEN  ('')TIMES 0
+WHEN  ('?Change:3')TIMES 0
+WHEN  ('?Change:5')TIMES 0
+WHEN  ('?Delete:3')TIMES 0
+WHEN  ('?Delete:5')TIMES 0
+WHEN  ('?Insert:3')TIMES 0
+WHEN  ('?Insert:5')TIMES 0
+WHEN  ('?TeachersTab')TIMES 0
+
+%ProcedureDisableEnhanceFocus LONG  (0)
+%ProcedureUseEnterInsteadTabOverride LONG  (0)
+%WindowUseEnterInsteadTab LONG  (1)
+%ProcedureUseEnterInsteadTabExcludeListCombo LONG  (0)
+%ProcedureUseEnterInsteadTabEnableNextTabStop LONG  (0)
+%ProcedureUseEnterInsteadTabExcludeG LONG  (1)
+%WindowUseEnterInsteadTabExclude MULTI DEFAULT  ()
+%WindowStyles MULTI LONG  ()
+%WindowStyleFontName DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontNameVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontNameIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontSize DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontSizeVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontSizeIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontStyle DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontStyleVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontStyleIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleFontColor DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleFontCharSet DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundNormal DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundNormal DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundNormalVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleBackgroundNormalIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundSelected DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleForegroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleForegroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundSelected DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleBackgroundSelectedVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStyleBackgroundSelectedIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStylePicture DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStylePictureVariable DEPEND %WindowStyles DEFAULT TIMES 0
+
+%WindowStylePictureIsVariable DEPEND %WindowStyles LONG TIMES 0
+
+%WindowStyleOtherListboxes MULTI DEFAULT  ()
+%ProcedureAutoBindFields MULTI LONG  ()
+%ProcedureAutoBindField DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+
+%ProcedureAutoBindFieldTPL DEPEND %ProcedureAutoBindFields DEFAULT TIMES 0
+
+%ProcedureAutoBindProcedures MULTI LONG  ()
+%ProcedureAutoBindProcedure DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+
+%ProcedureAutoBindProcedureTPL DEPEND %ProcedureAutoBindProcedures DEFAULT TIMES 0
+
+%ProcedureAutoBindFieldsIgnored MULTI LONG  ()
+%ProcedureAutoBindFieldIgnored DEPEND %ProcedureAutoBindFieldsIgnored DEFAULT TIMES 0
+
+%ProcedureAutoBindProceduresIgnored MULTI LONG  ()
+%ProcedureAutoBindProcedureIgnored DEPEND %ProcedureAutoBindProceduresIgnored DEFAULT TIMES 0
+
+%ProcedureAutoBindValidToAddField LONG  (1)
+%ProcedureUserBindFields MULTI LONG  ()
+%ProcedureUserBindField DEPEND %ProcedureUserBindFields FIELD TIMES 0
+
+%ProcedureAutoBindFieldIgnore DEPEND %ProcedureAutoBindFields LONG TIMES 0
+
+%ProcedureUserBindProcedures MULTI LONG  ()
+%ProcedureUserBindProcedure DEPEND %ProcedureUserBindProcedures PROCEDURE TIMES 0
+
+%ProcedureAutoBindProcedureIgnore DEPEND %ProcedureAutoBindProcedures LONG TIMES 0
+
+%ProcedureUserBindExpressions MULTI LONG  ()
+%ProcedureUserBindExpressionName DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+
+%ProcedureUserBindExpression DEPEND %ProcedureUserBindExpressions DEFAULT TIMES 0
+
+%ButtonReturnValueAssignment DEPEND %Control FIELD TIMES 0
+
+%ButtonReturnValueReferenceAssign DEPEND %Control LONG TIMES 0
+
+%ButtonThreadParameters DEPEND %Control DEFAULT TIMES 0
+
+%ButtonThreadReturnValueAssignment DEPEND %Control FIELD TIMES 0
+
+%PreLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+
+%PostLookupProcedureParameters DEPEND %Control DEFAULT TIMES 0
+
+%LookupAssign DEPEND %Control MULTI LONG TIMES 0
+
+%MoreTarget DEPEND %LookupAssign FIELD TIMES 0
+
+%MoreField DEPEND %LookupAssign DEFAULT TIMES 0
+
+%CheckedDisables DEPEND %Control MULTI LONG TIMES 0
+
+%CheckedDisableControl DEPEND %CheckedDisables DEFAULT TIMES 0
+
+%CheckedDisableControlAction DEPEND %CheckedDisables DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%UnCheckedDisables DEPEND %Control MULTI LONG TIMES 0
+
+%UnCheckedDisableControl DEPEND %UnCheckedDisables DEFAULT TIMES 0
+
+%UnCheckedDisableControlAction DEPEND %UnCheckedDisables DEFAULT TIMES 1
+WHEN  ('')TIMES 0
+
+%ExtUITabIcon DEPEND %Control DEFAULT TIMES 0
+
+%ExtUITabStyleOverrideGlobal DEPEND %Control LONG TIMES 0
+
+%ExtUITabStyle DEPEND %Control DEFAULT TIMES 2
+WHEN  ('') ('Default')
+WHEN  ('?CurrentTab') ('Default')
+
+%ActiveImageEnable DEPEND %Control LONG TIMES 0
+
+%AIObjectName DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('AIBtn0')
+
+%AIEnableMimicControl DEPEND %Control LONG TIMES 1
+WHEN  ('') (1)
+
+%AIMimicControl DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('?CurrentTab')
+
+%AIImgRound DEPEND %Control LONG TIMES 0
+
+%AIOverrideImg DEPEND %Control DEFAULT TIMES 0
+
+%AIOverrideImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIOverrideImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIDisableImg DEPEND %Control DEFAULT TIMES 0
+
+%AIDisableImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIDisableImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIHotImg DEPEND %Control DEFAULT TIMES 0
+
+%AIHotImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIHotImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%AIPressedImg DEPEND %Control DEFAULT TIMES 0
+
+%AIPressedImgVariable DEPEND %Control DEFAULT TIMES 0
+
+%AIPressedImgIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorType DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('Off')
+
+%FieldGradientColorTypeVariable DEPEND %Control DEFAULT TIMES 1
+WHEN  ('') ('')
+
+%FieldGradientColorTypeIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorFrom DEPEND %Control LONG TIMES 1
+WHEN  ('') (-1)
+
+%FieldGradientColorFromVariable DEPEND %Control DEFAULT TIMES 0
+
+%FieldGradientColorFromIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+%FieldGradientColorTo DEPEND %Control LONG TIMES 1
+WHEN  ('') (-1)
+
+%FieldGradientColorToVariable DEPEND %Control DEFAULT TIMES 0
+
+%FieldGradientColorToIsVariable DEPEND %Control LONG TIMES 1
+WHEN  ('') (0)
+
+[EMBED]
+EMBED %BeforeAccept
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+IF LocalRequest = InsertRecord
+  ?TeachersTab{PROP:Hide} = TRUE
+  ?StudentsTab{PROP:Hide} = TRUE
+END
+[END]
+EMBED %ControlPreEventHandling
+[INSTANCES]
+WHEN '?CurrentTab'
+[INSTANCES]
+WHEN 'NewSelection'
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 4000
+PROPERTY:END
+  !Code to assign button control based upon current tab selection
+  CASE CHOICE(?CurrentTab)
+  OF 1
+    DO FORM::AssignButtons
+  OF 2
+    DO BRW2::AssignButtons
+  OF 3
+    DO BRW4::AssignButtons
+  END
+[END]
+[END]
+[END]
+[END]
+[ADDITION]
+NAME Clarion RecordValidation
+[INSTANCE]
+INSTANCE 1
+PROCPROP
+[PROMPTS]
+%ValidateOnAccept LONG  (1)
+%ValidateOnNonStopSelect LONG  (1)
+%ControlsExcluded MULTI LONG  ()
+%ControlToExclude DEPEND %ControlsExcluded DEFAULT TIMES 0
+
+[ADDITION]
+NAME Clarion BrowseBox
+[INSTANCE]
+INSTANCE 2
+[PROMPTS]
+%EnableQuickScan LONG  (0)
+%LocatorType DEFAULT  ('')
+%OverrideDefaultLocator LONG  (0)
+%OverrideLocator DEFAULT  ('')
+%RecordFilter DEFAULT  ('')
+%RangeField COMPONENT  (TEA:Department)
+%RangeLimitType DEFAULT  ('File Relationship')
+%RangeLimit FIELD  ()
+%RangeLow FIELD  ()
+%RangeHigh FIELD  ()
+%RangeFile FILE  (Majors)
+%ScrollBehavior DEFAULT  ('Movable Thumb')
+%ScrollKeyDistribution DEFAULT  ('Runtime')
+%CustomKeyDistribution MULTI LONG  ()
+%KeyDistributionValue DEPEND %CustomKeyDistribution DEFAULT TIMES 0
+
+%ScrollAlpha LONG  (1)
+%ScrollNumeric LONG  (0)
+%ScrollAlt LONG  (0)
+%SortOrder MULTI LONG  ()
+%SortCondition DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortKey DEPEND %SortOrder KEY TIMES 0
+
+%SortLocatorType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortOverrideDefaultLocator DEPEND %SortOrder LONG TIMES 0
+
+%SortOverrideLocator DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRecordFilter DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRangeField DEPEND %SortOrder COMPONENT TIMES 0
+
+%SortRangeLimitType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRangeLimit DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeLow DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeHigh DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeFile DEPEND %SortOrder FILE TIMES 0
+
+%SortScrollBehavior DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortScrollKeyDistribution DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortCustomKeyDistribution DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortKeyDistributionValue DEPEND %SortCustomKeyDistribution DEFAULT TIMES 0
+
+%SortScrollAlpha DEPEND %SortOrder LONG TIMES 0
+
+%SortScrollNumeric DEPEND %SortOrder LONG TIMES 0
+
+%SortScrollAlt DEPEND %SortOrder LONG TIMES 0
+
+%ResetFields MULTI LONG  ()
+%ResetField DEPEND %ResetFields FIELD TIMES 0
+
+%SortResetFields DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortResetField DEPEND %SortResetFields FIELD TIMES 0
+
+%HotFields MULTI LONG  ()
+%HotField DEPEND %HotFields FIELD TIMES 0
+
+%HotFieldBound DEPEND %HotFields LONG TIMES 0
+
+%ControlFieldForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 14
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+WHEN  ('Tea:Address') (-1)
+WHEN  ('Tea:City') (-1)
+WHEN  ('Tea:FirstName') (-1)
+WHEN  ('Tea:LastName') (-1)
+WHEN  ('Tea:State') (-1)
+WHEN  ('Tea:Telephone') (-1)
+WHEN  ('Tea:Zip') (-1)
+
+%ControlFieldBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 14
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+WHEN  ('Tea:Address') (-1)
+WHEN  ('Tea:City') (-1)
+WHEN  ('Tea:FirstName') (-1)
+WHEN  ('Tea:LastName') (-1)
+WHEN  ('Tea:State') (-1)
+WHEN  ('Tea:Telephone') (-1)
+WHEN  ('Tea:Zip') (-1)
+
+%ControlFieldForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 14
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+WHEN  ('Tea:Address') (-1)
+WHEN  ('Tea:City') (-1)
+WHEN  ('Tea:FirstName') (-1)
+WHEN  ('Tea:LastName') (-1)
+WHEN  ('Tea:State') (-1)
+WHEN  ('Tea:Telephone') (-1)
+WHEN  ('Tea:Zip') (-1)
+
+%ControlFieldBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 14
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+WHEN  ('Tea:Address') (-1)
+WHEN  ('Tea:City') (-1)
+WHEN  ('Tea:FirstName') (-1)
+WHEN  ('Tea:LastName') (-1)
+WHEN  ('Tea:State') (-1)
+WHEN  ('Tea:Telephone') (-1)
+WHEN  ('Tea:Zip') (-1)
+
+%ConditionalColors DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('Tea:Address') ()
+WHEN  ('Tea:City') ()
+WHEN  ('Tea:FirstName') ()
+WHEN  ('Tea:LastName') ()
+WHEN  ('Tea:State') ()
+WHEN  ('Tea:Telephone') ()
+WHEN  ('Tea:Zip') ()
+
+%ColorCondition DEPEND %ConditionalColors DEFAULT TIMES 1
+WHEN  ('?Browse:2')TIMES 0
+
+%ConditionalControlFieldForegroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:2')TIMES 0
+
+%ConditionalControlFieldBackgroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:2')TIMES 0
+
+%ConditionalControlFieldForegroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:2')TIMES 0
+
+%ConditionalControlFieldBackgroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:2')TIMES 0
+
+%ControlFieldIcon DEPEND %Control DEPEND %ControlField DEFAULT TIMES 1
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('Tea:Address') ('')
+WHEN  ('Tea:City') ('')
+WHEN  ('Tea:FirstName') ('')
+WHEN  ('Tea:LastName') ('')
+WHEN  ('Tea:State') ('')
+WHEN  ('Tea:Telephone') ('')
+WHEN  ('Tea:Zip') ('')
+
+%ConditionalIcons DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('Tea:Address') ()
+WHEN  ('Tea:City') ()
+WHEN  ('Tea:FirstName') ()
+WHEN  ('Tea:LastName') ()
+WHEN  ('Tea:State') ()
+WHEN  ('Tea:Telephone') ()
+WHEN  ('Tea:Zip') ()
+
+%IconCondition DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:2')TIMES 0
+
+%ConditionalControlFieldIcon DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:2')TIMES 0
+
+%BrowseTotals MULTI LONG  ()
+%BrowseTotalTarget DEPEND %BrowseTotals FIELD TIMES 0
+
+%BrowseTotalType DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalField DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalBasedOn DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalCondition DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%AcceptToolBarControl LONG  (1)
+%TableSchematicsDescription DEFAULT  ('')
+%InterLine DEFAULT  ('0')
+%FindDefaultAnywhere LONG  (0)
+%HigherKeys MULTI LONG  ()
+%HigherKey DEPEND %HigherKeys COMPONENT TIMES 0
+
+%HigherKeyField DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueType DEPEND %HigherKeys DEFAULT TIMES 0
+
+%HigherKeyValueVariable DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueFixed DEPEND %HigherKeys DEFAULT TIMES 0
+
+%AdditionalSortType DEFAULT  ('Manual')
+%AddSortFields DEFAULT  ('')
+%AddSortFieldsAssisted MULTI LONG  ()
+%AddSortFieldAssisted DEPEND %AddSortFieldsAssisted FIELD TIMES 0
+
+%AddSortFieldAssistedOrder DEPEND %AddSortFieldsAssisted DEFAULT TIMES 0
+
+%SortFindDefaultAnywhere DEPEND %SortOrder LONG TIMES 0
+
+%SortHigherKeys DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortHigherKey DEPEND %SortHigherKeys COMPONENT TIMES 0
+
+%SortHigherKeyField DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 0
+
+%SortHigherKeyValueType DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 0
+
+%SortHigherKeyValueVariable DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 0
+
+%SortHigherKeyValueFixed DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 0
+
+%SortAdditionalSortType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortAddSortFields DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortAddSortFieldsAssisted DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortAddSortFieldAssisted DEPEND %SortAddSortFieldsAssisted FIELD TIMES 0
+
+%SortAddSortFieldAssistedOrder DEPEND %SortAddSortFieldsAssisted DEFAULT TIMES 0
+
+%UseSameColorForAll LONG  (0)
+%ControlGreenBarColor DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%GreenBarOnForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOnBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOnForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOnBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOffForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOffBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOffForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%GreenBarOffBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%AllControlGreenBarColor LONG  (0)
+%AllControlGreenBarColorAlternate LONG  (0)
+%AllControlFieldForegroundNormal LONG  (-1)
+%AllControlFieldBackgroundNormal LONG  (-1)
+%AllControlFieldForegroundSelected LONG  (-1)
+%AllControlFieldBackgroundSelected LONG  (-1)
+%ConditionalColorsAll MULTI LONG  ()
+%ColorConditionAll DEPEND %ConditionalColorsAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldForegroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldForegroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%AllGreenBarOnForegroundNormal LONG  (-1)
+%AllGreenBarOnBackgroundNormal LONG  (-1)
+%AllGreenBarOnForegroundSelected LONG  (-1)
+%AllGreenBarOnBackgroundSelected LONG  (-1)
+%AllGreenBarOffForegroundNormal LONG  (-1)
+%AllGreenBarOffBackgroundNormal LONG  (-1)
+%AllGreenBarOffForegroundSelected LONG  (-1)
+%AllGreenBarOffBackgroundSelected LONG  (-1)
+%ControlFieldIconIsNumber DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%ConditionalControlFieldIconIsNumber DEPEND %ConditionalIcons LONG TIMES 0
+
+%UseSameStyleForAll LONG  (0)
+%ControlGreenBarStyle DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%GreenBarOnStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Local List')
+WHEN  ('TEA:City') ('Local List')
+WHEN  ('TEA:FirstName') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+WHEN  ('TEA:State') ('Local List')
+WHEN  ('TEA:Telephone') ('Local List')
+WHEN  ('TEA:Zip') ('Local List')
+
+%GreenBarOnStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('')
+WHEN  ('TEA:City') ('')
+WHEN  ('TEA:FirstName') ('')
+WHEN  ('TEA:LastName') ('')
+WHEN  ('TEA:State') ('')
+WHEN  ('TEA:Telephone') ('')
+WHEN  ('TEA:Zip') ('')
+
+%GreenBarOnStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%GreenBarOffStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Local List')
+WHEN  ('TEA:City') ('Local List')
+WHEN  ('TEA:FirstName') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+WHEN  ('TEA:State') ('Local List')
+WHEN  ('TEA:Telephone') ('Local List')
+WHEN  ('TEA:Zip') ('Local List')
+
+%GreenBarOffStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('')
+WHEN  ('TEA:City') ('')
+WHEN  ('TEA:FirstName') ('')
+WHEN  ('TEA:LastName') ('')
+WHEN  ('TEA:State') ('')
+WHEN  ('TEA:Telephone') ('')
+WHEN  ('TEA:Zip') ('')
+
+%GreenBarOffStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ControlFieldStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Local List')
+WHEN  ('TEA:City') ('Local List')
+WHEN  ('TEA:FirstName') ('Local List')
+WHEN  ('TEA:LastName') ('Local List')
+WHEN  ('TEA:State') ('Local List')
+WHEN  ('TEA:Telephone') ('Local List')
+WHEN  ('TEA:Zip') ('Local List')
+
+%ControlFieldStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('')
+WHEN  ('TEA:City') ('')
+WHEN  ('TEA:FirstName') ('')
+WHEN  ('TEA:LastName') ('')
+WHEN  ('TEA:State') ('')
+WHEN  ('TEA:Telephone') ('')
+WHEN  ('TEA:Zip') ('')
+
+%ControlFieldStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ConditionalStyles DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%StyleCondition DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%ConditionalControlFieldStyleType DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyleLocalList DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyle DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%AllControlGreenBarStyle LONG  (0)
+%AllControlGreenBarStyleAlternate LONG  (0)
+%AllControlFieldStyleType DEFAULT  ('Local List')
+%AllControlFieldStyleLocalList DEFAULT  ('')
+%AllControlFieldStyle DEFAULT  ('')
+%ConditionalStylesAll MULTI LONG  ()
+%StyleConditionAll DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleType DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleLocalList DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyle DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%AllGreenBarOnStyleType DEFAULT  ('Local List')
+%AllGreenBarOnStyleLocalList DEFAULT  ('')
+%AllGreenBarOnStyle DEFAULT  ('')
+%AllGreenBarOffStyleType DEFAULT  ('Local List')
+%AllGreenBarOffStyleLocalList DEFAULT  ('')
+%AllGreenBarOffStyle DEFAULT  ('')
+%ControlFieldTipField DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%BrowseAllTotalOnOff LONG  (1)
+%BrowseAllTotalOnOffCondition DEFAULT  ('')
+%DisableAutoSizeColumn LONG  (0)
+%DisableListFormatManager LONG  (0)
+%ListFormatManagerAllowPopupInEmptyList DEFAULT  ('Enable')
+%ListFormatManagerCheckType DEFAULT  ('Icon')
+%ListFormatManagerItemsSortBy DEFAULT  ('Alpha')
+%ListFormatManagerUseIdentificationTip DEFAULT  ('Enable')
+%ListFormatManagerSaveWindowPosition DEFAULT  ('Enable')
+%ListFormatManagerSortOrder LONG  (1)
+%ListFormatManagerMenuAppendSortOrder LONG  (1)
+%ListFormatManagerSave LONG  (1)
+%UseMRP LONG  (1)
+%AddPopUp MULTI LONG  ()
+%AddPopUpChoice DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpControl DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpAction DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpProcedure DEPEND %AddPopUp PROCEDURE TIMES 0
+
+%AddPopUpThreadProcedure DEPEND %AddPopUp LONG TIMES 0
+
+%AddPopUpThreadStack DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpText DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%TypeAddPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%OtherPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpDisable DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpSeparate DEPEND %AddPopUp LONG TIMES 0
+
+[ADDITION]
+NAME Clarion BrowseUpdateButtons
+[INSTANCE]
+INSTANCE 3
+PARENT 2
+[PROMPTS]
+%UpdateProcedure PROCEDURE  (UpdateTeachers)
+%EditViaPopup LONG  (1)
+%EditInPlace LONG  (0)
+%ClassItem UNIQUE DEFAULT  ('CWEIPManager', 'EIP_TEA:Address', 'EIP_TEA:City', 'EIP_TEA:FirstName', |
+  'EIP_TEA:LastName', 'EIP_TEA:State', 'EIP_TEA:Telephone', 'EIP_TEA:Zip')
+%DefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 0
+
+%ActualDefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 0
+
+%ClassLines DEPEND %ClassItem MULTI DEFAULT TIMES 0
+
+%GlobalObject DEPEND %ClassItem DEFAULT TIMES 8
+WHEN  ('CWEIPManager') ('NO')
+WHEN  ('EIP_TEA:Address') ('NO')
+WHEN  ('EIP_TEA:City') ('NO')
+WHEN  ('EIP_TEA:FirstName') ('NO')
+WHEN  ('EIP_TEA:LastName') ('NO')
+WHEN  ('EIP_TEA:State') ('NO')
+WHEN  ('EIP_TEA:Telephone') ('NO')
+WHEN  ('EIP_TEA:Zip') ('NO')
+
+%ThisObjectName DEPEND %ClassItem DEFAULT TIMES 0
+
+%UseDefaultABCBaseClass DEPEND %ClassItem LONG TIMES 8
+WHEN  ('CWEIPManager') (1)
+WHEN  ('EIP_TEA:Address') (1)
+WHEN  ('EIP_TEA:City') (1)
+WHEN  ('EIP_TEA:FirstName') (1)
+WHEN  ('EIP_TEA:LastName') (1)
+WHEN  ('EIP_TEA:State') (1)
+WHEN  ('EIP_TEA:Telephone') (1)
+WHEN  ('EIP_TEA:Zip') (1)
+
+%UseABCBaseClass DEPEND %ClassItem LONG TIMES 8
+WHEN  ('CWEIPManager') (1)
+WHEN  ('EIP_TEA:Address') (1)
+WHEN  ('EIP_TEA:City') (1)
+WHEN  ('EIP_TEA:FirstName') (1)
+WHEN  ('EIP_TEA:LastName') (1)
+WHEN  ('EIP_TEA:State') (1)
+WHEN  ('EIP_TEA:Telephone') (1)
+WHEN  ('EIP_TEA:Zip') (1)
+
+%ABCBaseClass DEPEND %ClassItem DEFAULT TIMES 8
+WHEN  ('CWEIPManager') ('')
+WHEN  ('EIP_TEA:Address') ('')
+WHEN  ('EIP_TEA:City') ('')
+WHEN  ('EIP_TEA:FirstName') ('')
+WHEN  ('EIP_TEA:LastName') ('')
+WHEN  ('EIP_TEA:State') ('')
+WHEN  ('EIP_TEA:Telephone') ('')
+WHEN  ('EIP_TEA:Zip') ('')
+
+%ExtBaseClass DEPEND %ClassItem DEFAULT TIMES 0
+
+%BaseClassIncludeFile DEPEND %ClassItem DEFAULT TIMES 0
+
+%DeriveFromBaseClass DEPEND %ClassItem LONG TIMES 8
+WHEN  ('CWEIPManager') (0)
+WHEN  ('EIP_TEA:Address') (0)
+WHEN  ('EIP_TEA:City') (0)
+WHEN  ('EIP_TEA:FirstName') (0)
+WHEN  ('EIP_TEA:LastName') (0)
+WHEN  ('EIP_TEA:State') (0)
+WHEN  ('EIP_TEA:Telephone') (0)
+WHEN  ('EIP_TEA:Zip') (0)
+
+%NewMethods DEPEND %ClassItem MULTI LONG TIMES 0
+
+%NewMethodName DEPEND %NewMethods DEFAULT TIMES 0
+
+%NewMethodPrototype DEPEND %NewMethods DEFAULT TIMES 0
+
+%NewClassPropertyItems DEPEND %ClassItem MULTI LONG TIMES 0
+
+%NewClassProperty DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataType DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassOtherType DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataIsRef DEPEND %NewClassPropertyItems LONG TIMES 0
+
+%NewClassDataSize DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim1 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim2 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim3 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim4 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%ClassMethods DEPEND %ClassItem MULTI LONG TIMES 0
+
+%ClassMethodName DEPEND %ClassMethods DEFAULT TIMES 0
+
+%ClassMethodPrototype DEPEND %ClassMethods DEFAULT TIMES 0
+
+%ClassPropertyItems DEPEND %ClassItem MULTI LONG TIMES 0
+
+%ClassProperty DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataType DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassOtherType DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataIsRef DEPEND %ClassPropertyItems LONG TIMES 0
+
+%ClassDataSize DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim1 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim2 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim3 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim4 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%EIPTabAction DEFAULT  ('Default')
+%EIPTabRemain LONG  (0)
+%EIPEnterAction DEFAULT  ('Default')
+%EIPEnterRemain LONG  (0)
+%EIPArrowAction DEFAULT  ('Default')
+%EIPArrowRemain LONG  (1)
+%EIPArrowRetain LONG  (1)
+%EIPFocusAction DEFAULT  ('Default')
+%EIPInsertionPoint DEFAULT  ('After')
+%EIPAskOnDelete DEFAULT  ('Always')
+%PrimingFields MULTI LONG  ()
+%PrimedField DEPEND %PrimingFields FIELD TIMES 0
+
+%PrimedValue DEPEND %PrimingFields DEFAULT TIMES 0
+
+%AllowEIP DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (1)
+WHEN  ('TEA:City') (1)
+WHEN  ('TEA:FirstName') (1)
+WHEN  ('TEA:LastName') (1)
+WHEN  ('TEA:State') (1)
+WHEN  ('TEA:Telephone') (1)
+WHEN  ('TEA:Zip') (1)
+
+%EditInPlaceType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Entry')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Entry')
+WHEN  ('TEA:City') ('Entry')
+WHEN  ('TEA:FirstName') ('Entry')
+WHEN  ('TEA:LastName') ('Entry')
+WHEN  ('TEA:State') ('Entry')
+WHEN  ('TEA:Telephone') ('Entry')
+WHEN  ('TEA:Zip') ('Entry')
+
+%EditInPlaceFEQTitle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQJust DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Default')
+WHEN  ('TEA:City') ('Default')
+WHEN  ('TEA:FirstName') ('Default')
+WHEN  ('TEA:LastName') ('Default')
+WHEN  ('TEA:State') ('Default')
+WHEN  ('TEA:Telephone') ('Default')
+WHEN  ('TEA:Zip') ('Default')
+
+%EditInPlaceFEQOffset DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQTransparent DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQReadOnly DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQRequired DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQDataSource DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Fixed')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Fixed')
+WHEN  ('TEA:City') ('Fixed')
+WHEN  ('TEA:FirstName') ('Fixed')
+WHEN  ('TEA:LastName') ('Fixed')
+WHEN  ('TEA:State') ('Fixed')
+WHEN  ('TEA:Telephone') ('Fixed')
+WHEN  ('TEA:Zip') ('Fixed')
+
+%EditInPlaceFEQFixedDataSource DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%EditInPlaceFEQFixedDataSourceValue DEPEND %EditInPlaceFEQFixedDataSource DEFAULT TIMES 0
+
+%EditInPlaceFEQFixedDataSourceSelected DEPEND %EditInPlaceFEQFixedDataSource LONG TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%EditInPlaceFEQQueueDataSourceQN DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQQueueDataSourceV DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQQueueDataSourceS DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQAutoSerializeField DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQAutoSerializeFieldDelimiter DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ReturnToOriginalDir DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%AllowLongFilenames DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (1)
+WHEN  ('TEA:City') (1)
+WHEN  ('TEA:FirstName') (1)
+WHEN  ('TEA:LastName') (1)
+WHEN  ('TEA:State') (1)
+WHEN  ('TEA:Telephone') (1)
+WHEN  ('TEA:Zip') (1)
+
+%DOSFileDialogType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Open')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Open')
+WHEN  ('TEA:City') ('Open')
+WHEN  ('TEA:FirstName') ('Open')
+WHEN  ('TEA:LastName') ('Open')
+WHEN  ('TEA:State') ('Open')
+WHEN  ('TEA:Telephone') ('Open')
+WHEN  ('TEA:Zip') ('Open')
+
+%AllowNoError DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%AllowMultiSelect DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%DOSMaskDesc DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('All Files')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('All Files')
+WHEN  ('TEA:City') ('All Files')
+WHEN  ('TEA:FirstName') ('All Files')
+WHEN  ('TEA:LastName') ('All Files')
+WHEN  ('TEA:State') ('All Files')
+WHEN  ('TEA:Telephone') ('All Files')
+WHEN  ('TEA:Zip') ('All Files')
+
+%DOSMask DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('*.*')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('*.*')
+WHEN  ('TEA:City') ('*.*')
+WHEN  ('TEA:FirstName') ('*.*')
+WHEN  ('TEA:LastName') ('*.*')
+WHEN  ('TEA:State') ('*.*')
+WHEN  ('TEA:Telephone') ('*.*')
+WHEN  ('TEA:Zip') ('*.*')
+
+%DOSMoreMasks DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%DOSMoreMaskDesc DEPEND %DOSMoreMasks DEFAULT TIMES 0
+
+%DOSMoreMask DEPEND %DOSMoreMasks DEFAULT TIMES 0
+
+%EditInPlaceFEQForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%EditInPlaceFEQBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%EditInPlaceFEQForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%EditInPlaceFEQBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (-1)
+WHEN  ('TEA:City') (-1)
+WHEN  ('TEA:FirstName') (-1)
+WHEN  ('TEA:LastName') (-1)
+WHEN  ('TEA:State') (-1)
+WHEN  ('TEA:Telephone') (-1)
+WHEN  ('TEA:Zip') (-1)
+
+%EditInPlaceFEQFrom DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQColumnFrom DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQPicture DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQListFormat DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQDrop DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQWidth DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQCase DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Default')
+WHEN  ('TEA:City') ('Default')
+WHEN  ('TEA:FirstName') ('Default')
+WHEN  ('TEA:LastName') ('Default')
+WHEN  ('TEA:State') ('Default')
+WHEN  ('TEA:Telephone') ('Default')
+WHEN  ('TEA:Zip') ('Default')
+
+%EditInPlaceFEQFlat DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQHorizontal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQVertical DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQImmediate DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%EditInPlaceFEQEntryCompletion DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%LookupAssign DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%MoreTarget DEPEND %LookupAssign FIELD TIMES 0
+
+%MoreField DEPEND %LookupAssign DEFAULT TIMES 0
+
+%EditInPlaceFEQFixedDataSourceText DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQCheckJust DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Default')
+WHEN  ('TEA:City') ('Default')
+WHEN  ('TEA:FirstName') ('Default')
+WHEN  ('TEA:LastName') ('Default')
+WHEN  ('TEA:State') ('Default')
+WHEN  ('TEA:Telephone') ('Default')
+WHEN  ('TEA:Zip') ('Default')
+
+%EditInPlaceFEQTrue DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQFalse DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQTrueLabel DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQFalseLabel DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQEntryMode DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Default')
+WHEN  ('TEA:City') ('Default')
+WHEN  ('TEA:FirstName') ('Default')
+WHEN  ('TEA:LastName') ('Default')
+WHEN  ('TEA:State') ('Default')
+WHEN  ('TEA:Telephone') ('Default')
+WHEN  ('TEA:Zip') ('Default')
+
+%EditInPlaceFEQLower DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQUpper DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQStep DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('0')
+WHEN  ('TEA:City') ('0')
+WHEN  ('TEA:FirstName') ('0')
+WHEN  ('TEA:LastName') ('0')
+WHEN  ('TEA:State') ('0')
+WHEN  ('TEA:Telephone') ('0')
+WHEN  ('TEA:Zip') ('0')
+
+%EditInPlaceFEQPassword DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') (0)
+WHEN  ('TEA:City') (0)
+WHEN  ('TEA:FirstName') (0)
+WHEN  ('TEA:LastName') (0)
+WHEN  ('TEA:State') (0)
+WHEN  ('TEA:Telephone') (0)
+WHEN  ('TEA:Zip') (0)
+
+%LookupType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Related Field')
+WHEN  ('?Browse:2')TIMES 7
+WHEN  ('TEA:Address') ('Related Field')
+WHEN  ('TEA:City') ('Related Field')
+WHEN  ('TEA:FirstName') ('Related Field')
+WHEN  ('TEA:LastName') ('Related Field')
+WHEN  ('TEA:State') ('Related Field')
+WHEN  ('TEA:Telephone') ('Related Field')
+WHEN  ('TEA:Zip') ('Related Field')
+
+%PostLookupKey DEPEND %Control DEPEND %ControlField KEY TIMES 0
+
+%PostLookupField DEPEND %Control DEPEND %ControlField COMPONENT TIMES 0
+
+%PostLookupFieldNoRelated DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%PostLookupProcedure DEPEND %Control DEPEND %ControlField PROCEDURE TIMES 0
+
+%PostLookupProcedureParameters DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%PostLookupProcedureReturnValue DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EIPThisObjectName DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%UpdateProcedureParameters DEFAULT  ('')
+[ADDITION]
+NAME Clarion BrowseBox
+[INSTANCE]
+INSTANCE 4
+[PROMPTS]
+%EnableQuickScan LONG  (0)
+%LocatorType DEFAULT  ('Step')
+%OverrideDefaultLocator LONG  (0)
+%OverrideLocator DEFAULT  ('')
+%RecordFilter DEFAULT  ('')
+%RangeField COMPONENT  (STU:Major)
+%RangeLimitType DEFAULT  ('File Relationship')
+%RangeLimit FIELD  ()
+%RangeLow FIELD  ()
+%RangeHigh FIELD  ()
+%RangeFile FILE  (Majors)
+%ScrollBehavior DEFAULT  ('Movable Thumb')
+%ScrollKeyDistribution DEFAULT  ('Runtime')
+%CustomKeyDistribution MULTI LONG  ()
+%KeyDistributionValue DEPEND %CustomKeyDistribution DEFAULT TIMES 0
+
+%ScrollAlpha LONG  (1)
+%ScrollNumeric LONG  (0)
+%ScrollAlt LONG  (0)
+%SortOrder MULTI LONG  ()
+%SortCondition DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortKey DEPEND %SortOrder KEY TIMES 0
+
+%SortLocatorType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortOverrideDefaultLocator DEPEND %SortOrder LONG TIMES 0
+
+%SortOverrideLocator DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRecordFilter DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRangeField DEPEND %SortOrder COMPONENT TIMES 0
+
+%SortRangeLimitType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortRangeLimit DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeLow DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeHigh DEPEND %SortOrder FIELD TIMES 0
+
+%SortRangeFile DEPEND %SortOrder FILE TIMES 0
+
+%SortScrollBehavior DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortScrollKeyDistribution DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortCustomKeyDistribution DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortKeyDistributionValue DEPEND %SortCustomKeyDistribution DEFAULT TIMES 0
+
+%SortScrollAlpha DEPEND %SortOrder LONG TIMES 0
+
+%SortScrollNumeric DEPEND %SortOrder LONG TIMES 0
+
+%SortScrollAlt DEPEND %SortOrder LONG TIMES 0
+
+%ResetFields MULTI LONG  ()
+%ResetField DEPEND %ResetFields FIELD TIMES 0
+
+%SortResetFields DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortResetField DEPEND %SortResetFields FIELD TIMES 0
+
+%HotFields MULTI LONG  ()
+%HotField DEPEND %HotFields FIELD TIMES 0
+
+%HotFieldBound DEPEND %HotFields LONG TIMES 0
+
+%ControlFieldForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%ControlFieldBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%ControlFieldForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%ControlFieldBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%ConditionalColors DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ()
+WHEN  ('STU:Address2') ()
+WHEN  ('STU:City') ()
+WHEN  ('STU:FirstName') ()
+WHEN  ('STU:GradYear') ()
+WHEN  ('STU:LastName') ()
+WHEN  ('STU:State') ()
+WHEN  ('STU:Telephone') ()
+WHEN  ('STU:Zip') ()
+
+%ColorCondition DEPEND %ConditionalColors DEFAULT TIMES 1
+WHEN  ('?Browse:4')TIMES 0
+
+%ConditionalControlFieldForegroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:4')TIMES 0
+
+%ConditionalControlFieldBackgroundNormal DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:4')TIMES 0
+
+%ConditionalControlFieldForegroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:4')TIMES 0
+
+%ConditionalControlFieldBackgroundSelected DEPEND %ConditionalColors LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+WHEN  ('?Browse:4')TIMES 0
+
+%ControlFieldIcon DEPEND %Control DEPEND %ControlField DEFAULT TIMES 1
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('')
+WHEN  ('STU:Address2') ('')
+WHEN  ('STU:City') ('')
+WHEN  ('STU:FirstName') ('')
+WHEN  ('STU:GradYear') ('')
+WHEN  ('STU:LastName') ('')
+WHEN  ('STU:State') ('')
+WHEN  ('STU:Telephone') ('')
+WHEN  ('STU:Zip') ('')
+
+%ConditionalIcons DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 1
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ()
+WHEN  ('STU:Address2') ()
+WHEN  ('STU:City') ()
+WHEN  ('STU:FirstName') ()
+WHEN  ('STU:GradYear') ()
+WHEN  ('STU:LastName') ()
+WHEN  ('STU:State') ()
+WHEN  ('STU:Telephone') ()
+WHEN  ('STU:Zip') ()
+
+%IconCondition DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:4')TIMES 0
+
+%ConditionalControlFieldIcon DEPEND %ConditionalIcons DEFAULT TIMES 1
+WHEN  ('?Browse:4')TIMES 0
+
+%BrowseTotals MULTI LONG  ()
+%BrowseTotalTarget DEPEND %BrowseTotals FIELD TIMES 0
+
+%BrowseTotalType DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalField DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalBasedOn DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%BrowseTotalCondition DEPEND %BrowseTotals DEFAULT TIMES 0
+
+%AcceptToolBarControl LONG  (1)
+%TableSchematicsDescription DEFAULT  ('')
+%InterLine DEFAULT  ('0')
+%FindDefaultAnywhere LONG  (0)
+%HigherKeys MULTI LONG  ()
+%HigherKey DEPEND %HigherKeys COMPONENT TIMES 0
+
+%HigherKeyField DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueType DEPEND %HigherKeys DEFAULT TIMES 0
+
+%HigherKeyValueVariable DEPEND %HigherKeys FIELD TIMES 0
+
+%HigherKeyValueFixed DEPEND %HigherKeys DEFAULT TIMES 0
+
+%AdditionalSortType DEFAULT  ('Manual')
+%AddSortFields DEFAULT  ('')
+%AddSortFieldsAssisted MULTI LONG  ()
+%AddSortFieldAssisted DEPEND %AddSortFieldsAssisted FIELD TIMES 0
+
+%AddSortFieldAssistedOrder DEPEND %AddSortFieldsAssisted DEFAULT TIMES 0
+
+%SortFindDefaultAnywhere DEPEND %SortOrder LONG TIMES 0
+
+%SortHigherKeys DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortHigherKey DEPEND %SortHigherKeys COMPONENT TIMES 0
+
+%SortHigherKeyField DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 0
+
+%SortHigherKeyValueType DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 0
+
+%SortHigherKeyValueVariable DEPEND %SortOrder DEPEND %SortHigherKeys FIELD TIMES 0
+
+%SortHigherKeyValueFixed DEPEND %SortOrder DEPEND %SortHigherKeys DEFAULT TIMES 0
+
+%SortAdditionalSortType DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortAddSortFields DEPEND %SortOrder DEFAULT TIMES 0
+
+%SortAddSortFieldsAssisted DEPEND %SortOrder MULTI LONG TIMES 0
+
+%SortAddSortFieldAssisted DEPEND %SortAddSortFieldsAssisted FIELD TIMES 0
+
+%SortAddSortFieldAssistedOrder DEPEND %SortAddSortFieldsAssisted DEFAULT TIMES 0
+
+%UseSameColorForAll LONG  (0)
+%ControlGreenBarColor DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%GreenBarOnForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOnBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOnForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOnBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOffForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOffBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOffForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%GreenBarOffBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%AllControlGreenBarColor LONG  (0)
+%AllControlGreenBarColorAlternate LONG  (0)
+%AllControlFieldForegroundNormal LONG  (-1)
+%AllControlFieldBackgroundNormal LONG  (-1)
+%AllControlFieldForegroundSelected LONG  (-1)
+%AllControlFieldBackgroundSelected LONG  (-1)
+%ConditionalColorsAll MULTI LONG  ()
+%ColorConditionAll DEPEND %ConditionalColorsAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldForegroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundNormal DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldForegroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%ConditionalAllControlFieldBackgroundSelected DEPEND %ConditionalColorsAll LONG TIMES 0
+
+%AllGreenBarOnForegroundNormal LONG  (-1)
+%AllGreenBarOnBackgroundNormal LONG  (-1)
+%AllGreenBarOnForegroundSelected LONG  (-1)
+%AllGreenBarOnBackgroundSelected LONG  (-1)
+%AllGreenBarOffForegroundNormal LONG  (-1)
+%AllGreenBarOffBackgroundNormal LONG  (-1)
+%AllGreenBarOffForegroundSelected LONG  (-1)
+%AllGreenBarOffBackgroundSelected LONG  (-1)
+%ControlFieldIconIsNumber DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%ConditionalControlFieldIconIsNumber DEPEND %ConditionalIcons LONG TIMES 0
+
+%UseSameStyleForAll LONG  (0)
+%ControlGreenBarStyle DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%GreenBarOnStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Local List')
+WHEN  ('STU:Address2') ('Local List')
+WHEN  ('STU:City') ('Local List')
+WHEN  ('STU:FirstName') ('Local List')
+WHEN  ('STU:GradYear') ('Local List')
+WHEN  ('STU:LastName') ('Local List')
+WHEN  ('STU:State') ('Local List')
+WHEN  ('STU:Telephone') ('Local List')
+WHEN  ('STU:Zip') ('Local List')
+
+%GreenBarOnStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('')
+WHEN  ('STU:Address2') ('')
+WHEN  ('STU:City') ('')
+WHEN  ('STU:FirstName') ('')
+WHEN  ('STU:GradYear') ('')
+WHEN  ('STU:LastName') ('')
+WHEN  ('STU:State') ('')
+WHEN  ('STU:Telephone') ('')
+WHEN  ('STU:Zip') ('')
+
+%GreenBarOnStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%GreenBarOffStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Local List')
+WHEN  ('STU:Address2') ('Local List')
+WHEN  ('STU:City') ('Local List')
+WHEN  ('STU:FirstName') ('Local List')
+WHEN  ('STU:GradYear') ('Local List')
+WHEN  ('STU:LastName') ('Local List')
+WHEN  ('STU:State') ('Local List')
+WHEN  ('STU:Telephone') ('Local List')
+WHEN  ('STU:Zip') ('Local List')
+
+%GreenBarOffStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('')
+WHEN  ('STU:Address2') ('')
+WHEN  ('STU:City') ('')
+WHEN  ('STU:FirstName') ('')
+WHEN  ('STU:GradYear') ('')
+WHEN  ('STU:LastName') ('')
+WHEN  ('STU:State') ('')
+WHEN  ('STU:Telephone') ('')
+WHEN  ('STU:Zip') ('')
+
+%GreenBarOffStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ControlFieldStyleType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Local List')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Local List')
+WHEN  ('STU:Address2') ('Local List')
+WHEN  ('STU:City') ('Local List')
+WHEN  ('STU:FirstName') ('Local List')
+WHEN  ('STU:GradYear') ('Local List')
+WHEN  ('STU:LastName') ('Local List')
+WHEN  ('STU:State') ('Local List')
+WHEN  ('STU:Telephone') ('Local List')
+WHEN  ('STU:Zip') ('Local List')
+
+%ControlFieldStyleLocalList DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('')
+WHEN  ('STU:Address2') ('')
+WHEN  ('STU:City') ('')
+WHEN  ('STU:FirstName') ('')
+WHEN  ('STU:GradYear') ('')
+WHEN  ('STU:LastName') ('')
+WHEN  ('STU:State') ('')
+WHEN  ('STU:Telephone') ('')
+WHEN  ('STU:Zip') ('')
+
+%ControlFieldStyle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ConditionalStyles DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%StyleCondition DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%ConditionalControlFieldStyleType DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyleLocalList DEPEND %ConditionalStyles DEFAULT TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%ConditionalControlFieldStyle DEPEND %ConditionalStyles DEFAULT TIMES 0
+
+%AllControlGreenBarStyle LONG  (0)
+%AllControlGreenBarStyleAlternate LONG  (0)
+%AllControlFieldStyleType DEFAULT  ('Local List')
+%AllControlFieldStyleLocalList DEFAULT  ('')
+%AllControlFieldStyle DEFAULT  ('')
+%ConditionalStylesAll MULTI LONG  ()
+%StyleConditionAll DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleType DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyleLocalList DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%ConditionalAllControlFieldStyle DEPEND %ConditionalStylesAll DEFAULT TIMES 0
+
+%AllGreenBarOnStyleType DEFAULT  ('Local List')
+%AllGreenBarOnStyleLocalList DEFAULT  ('')
+%AllGreenBarOnStyle DEFAULT  ('')
+%AllGreenBarOffStyleType DEFAULT  ('Local List')
+%AllGreenBarOffStyleLocalList DEFAULT  ('')
+%AllGreenBarOffStyle DEFAULT  ('')
+%ControlFieldTipField DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%BrowseAllTotalOnOff LONG  (1)
+%BrowseAllTotalOnOffCondition DEFAULT  ('')
+%DisableAutoSizeColumn LONG  (0)
+%DisableListFormatManager LONG  (0)
+%ListFormatManagerAllowPopupInEmptyList DEFAULT  ('Enable')
+%ListFormatManagerCheckType DEFAULT  ('Icon')
+%ListFormatManagerItemsSortBy DEFAULT  ('Alpha')
+%ListFormatManagerUseIdentificationTip DEFAULT  ('Enable')
+%ListFormatManagerSaveWindowPosition DEFAULT  ('Enable')
+%ListFormatManagerSortOrder LONG  (1)
+%ListFormatManagerMenuAppendSortOrder LONG  (1)
+%ListFormatManagerSave LONG  (1)
+%UseMRP LONG  (1)
+%AddPopUp MULTI LONG  ()
+%AddPopUpChoice DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpControl DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpAction DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpProcedure DEPEND %AddPopUp PROCEDURE TIMES 0
+
+%AddPopUpThreadProcedure DEPEND %AddPopUp LONG TIMES 0
+
+%AddPopUpThreadStack DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpText DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%TypeAddPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%OtherPopupIcon DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpDisable DEPEND %AddPopUp DEFAULT TIMES 0
+
+%AddPopUpSeparate DEPEND %AddPopUp LONG TIMES 0
+
+[ADDITION]
+NAME Clarion BrowseUpdateButtons
+[INSTANCE]
+INSTANCE 5
+PARENT 4
+[PROMPTS]
+%UpdateProcedure PROCEDURE  (UpdateStudents)
+%EditViaPopup LONG  (1)
+%EditInPlace LONG  (0)
+%ClassItem UNIQUE DEFAULT  ('CWEIPManager', 'EIP_STU:Address', 'EIP_STU:Address2', |
+  'EIP_STU:City', 'EIP_STU:FirstName', 'EIP_STU:GradYear', 'EIP_STU:LastName', 'EIP_STU:State', |
+  'EIP_STU:Telephone', 'EIP_STU:Zip')
+%DefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 0
+
+%ActualDefaultBaseClassType DEPEND %ClassItem DEFAULT TIMES 0
+
+%ClassLines DEPEND %ClassItem MULTI DEFAULT TIMES 0
+
+%GlobalObject DEPEND %ClassItem DEFAULT TIMES 10
+WHEN  ('CWEIPManager') ('NO')
+WHEN  ('EIP_STU:Address') ('NO')
+WHEN  ('EIP_STU:Address2') ('NO')
+WHEN  ('EIP_STU:City') ('NO')
+WHEN  ('EIP_STU:FirstName') ('NO')
+WHEN  ('EIP_STU:GradYear') ('NO')
+WHEN  ('EIP_STU:LastName') ('NO')
+WHEN  ('EIP_STU:State') ('NO')
+WHEN  ('EIP_STU:Telephone') ('NO')
+WHEN  ('EIP_STU:Zip') ('NO')
+
+%ThisObjectName DEPEND %ClassItem DEFAULT TIMES 0
+
+%UseDefaultABCBaseClass DEPEND %ClassItem LONG TIMES 10
+WHEN  ('CWEIPManager') (1)
+WHEN  ('EIP_STU:Address') (1)
+WHEN  ('EIP_STU:Address2') (1)
+WHEN  ('EIP_STU:City') (1)
+WHEN  ('EIP_STU:FirstName') (1)
+WHEN  ('EIP_STU:GradYear') (1)
+WHEN  ('EIP_STU:LastName') (1)
+WHEN  ('EIP_STU:State') (1)
+WHEN  ('EIP_STU:Telephone') (1)
+WHEN  ('EIP_STU:Zip') (1)
+
+%UseABCBaseClass DEPEND %ClassItem LONG TIMES 10
+WHEN  ('CWEIPManager') (1)
+WHEN  ('EIP_STU:Address') (1)
+WHEN  ('EIP_STU:Address2') (1)
+WHEN  ('EIP_STU:City') (1)
+WHEN  ('EIP_STU:FirstName') (1)
+WHEN  ('EIP_STU:GradYear') (1)
+WHEN  ('EIP_STU:LastName') (1)
+WHEN  ('EIP_STU:State') (1)
+WHEN  ('EIP_STU:Telephone') (1)
+WHEN  ('EIP_STU:Zip') (1)
+
+%ABCBaseClass DEPEND %ClassItem DEFAULT TIMES 10
+WHEN  ('CWEIPManager') ('')
+WHEN  ('EIP_STU:Address') ('')
+WHEN  ('EIP_STU:Address2') ('')
+WHEN  ('EIP_STU:City') ('')
+WHEN  ('EIP_STU:FirstName') ('')
+WHEN  ('EIP_STU:GradYear') ('')
+WHEN  ('EIP_STU:LastName') ('')
+WHEN  ('EIP_STU:State') ('')
+WHEN  ('EIP_STU:Telephone') ('')
+WHEN  ('EIP_STU:Zip') ('')
+
+%ExtBaseClass DEPEND %ClassItem DEFAULT TIMES 0
+
+%BaseClassIncludeFile DEPEND %ClassItem DEFAULT TIMES 0
+
+%DeriveFromBaseClass DEPEND %ClassItem LONG TIMES 10
+WHEN  ('CWEIPManager') (0)
+WHEN  ('EIP_STU:Address') (0)
+WHEN  ('EIP_STU:Address2') (0)
+WHEN  ('EIP_STU:City') (0)
+WHEN  ('EIP_STU:FirstName') (0)
+WHEN  ('EIP_STU:GradYear') (0)
+WHEN  ('EIP_STU:LastName') (0)
+WHEN  ('EIP_STU:State') (0)
+WHEN  ('EIP_STU:Telephone') (0)
+WHEN  ('EIP_STU:Zip') (0)
+
+%NewMethods DEPEND %ClassItem MULTI LONG TIMES 0
+
+%NewMethodName DEPEND %NewMethods DEFAULT TIMES 0
+
+%NewMethodPrototype DEPEND %NewMethods DEFAULT TIMES 0
+
+%NewClassPropertyItems DEPEND %ClassItem MULTI LONG TIMES 0
+
+%NewClassProperty DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataType DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassOtherType DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataIsRef DEPEND %NewClassPropertyItems LONG TIMES 0
+
+%NewClassDataSize DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim1 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim2 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim3 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%NewClassDataDim4 DEPEND %NewClassPropertyItems DEFAULT TIMES 0
+
+%ClassMethods DEPEND %ClassItem MULTI LONG TIMES 0
+
+%ClassMethodName DEPEND %ClassMethods DEFAULT TIMES 0
+
+%ClassMethodPrototype DEPEND %ClassMethods DEFAULT TIMES 0
+
+%ClassPropertyItems DEPEND %ClassItem MULTI LONG TIMES 0
+
+%ClassProperty DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataType DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassOtherType DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataIsRef DEPEND %ClassPropertyItems LONG TIMES 0
+
+%ClassDataSize DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim1 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim2 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim3 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%ClassDataDim4 DEPEND %ClassPropertyItems DEFAULT TIMES 0
+
+%EIPTabAction DEFAULT  ('Default')
+%EIPTabRemain LONG  (0)
+%EIPEnterAction DEFAULT  ('Default')
+%EIPEnterRemain LONG  (0)
+%EIPArrowAction DEFAULT  ('Default')
+%EIPArrowRemain LONG  (1)
+%EIPArrowRetain LONG  (1)
+%EIPFocusAction DEFAULT  ('Default')
+%EIPInsertionPoint DEFAULT  ('After')
+%EIPAskOnDelete DEFAULT  ('Always')
+%PrimingFields MULTI LONG  ()
+%PrimedField DEPEND %PrimingFields FIELD TIMES 0
+
+%PrimedValue DEPEND %PrimingFields DEFAULT TIMES 0
+
+%AllowEIP DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (1)
+WHEN  ('STU:Address2') (1)
+WHEN  ('STU:City') (1)
+WHEN  ('STU:FirstName') (1)
+WHEN  ('STU:GradYear') (1)
+WHEN  ('STU:LastName') (1)
+WHEN  ('STU:State') (1)
+WHEN  ('STU:Telephone') (1)
+WHEN  ('STU:Zip') (1)
+
+%EditInPlaceType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Entry')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Entry')
+WHEN  ('STU:Address2') ('Entry')
+WHEN  ('STU:City') ('Entry')
+WHEN  ('STU:FirstName') ('Entry')
+WHEN  ('STU:GradYear') ('Entry')
+WHEN  ('STU:LastName') ('Entry')
+WHEN  ('STU:State') ('Entry')
+WHEN  ('STU:Telephone') ('Entry')
+WHEN  ('STU:Zip') ('Entry')
+
+%EditInPlaceFEQTitle DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQJust DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Default')
+WHEN  ('STU:Address2') ('Default')
+WHEN  ('STU:City') ('Default')
+WHEN  ('STU:FirstName') ('Default')
+WHEN  ('STU:GradYear') ('Default')
+WHEN  ('STU:LastName') ('Default')
+WHEN  ('STU:State') ('Default')
+WHEN  ('STU:Telephone') ('Default')
+WHEN  ('STU:Zip') ('Default')
+
+%EditInPlaceFEQOffset DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQTransparent DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQReadOnly DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQRequired DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQDataSource DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Fixed')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Fixed')
+WHEN  ('STU:Address2') ('Fixed')
+WHEN  ('STU:City') ('Fixed')
+WHEN  ('STU:FirstName') ('Fixed')
+WHEN  ('STU:GradYear') ('Fixed')
+WHEN  ('STU:LastName') ('Fixed')
+WHEN  ('STU:State') ('Fixed')
+WHEN  ('STU:Telephone') ('Fixed')
+WHEN  ('STU:Zip') ('Fixed')
+
+%EditInPlaceFEQFixedDataSource DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%EditInPlaceFEQFixedDataSourceValue DEPEND %EditInPlaceFEQFixedDataSource DEFAULT TIMES 0
+
+%EditInPlaceFEQFixedDataSourceSelected DEPEND %EditInPlaceFEQFixedDataSource LONG TIMES 1
+WHEN  ('')TIMES 1
+WHEN  ('')TIMES 0
+
+%EditInPlaceFEQQueueDataSourceQN DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQQueueDataSourceV DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQQueueDataSourceS DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%EditInPlaceFEQAutoSerializeField DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQAutoSerializeFieldDelimiter DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%ReturnToOriginalDir DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%AllowLongFilenames DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (1)
+WHEN  ('STU:Address2') (1)
+WHEN  ('STU:City') (1)
+WHEN  ('STU:FirstName') (1)
+WHEN  ('STU:GradYear') (1)
+WHEN  ('STU:LastName') (1)
+WHEN  ('STU:State') (1)
+WHEN  ('STU:Telephone') (1)
+WHEN  ('STU:Zip') (1)
+
+%DOSFileDialogType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Open')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Open')
+WHEN  ('STU:Address2') ('Open')
+WHEN  ('STU:City') ('Open')
+WHEN  ('STU:FirstName') ('Open')
+WHEN  ('STU:GradYear') ('Open')
+WHEN  ('STU:LastName') ('Open')
+WHEN  ('STU:State') ('Open')
+WHEN  ('STU:Telephone') ('Open')
+WHEN  ('STU:Zip') ('Open')
+
+%AllowNoError DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%AllowMultiSelect DEPEND %Control DEPEND %ControlField LONG TIMES 0
+
+%DOSMaskDesc DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('All Files')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('All Files')
+WHEN  ('STU:Address2') ('All Files')
+WHEN  ('STU:City') ('All Files')
+WHEN  ('STU:FirstName') ('All Files')
+WHEN  ('STU:GradYear') ('All Files')
+WHEN  ('STU:LastName') ('All Files')
+WHEN  ('STU:State') ('All Files')
+WHEN  ('STU:Telephone') ('All Files')
+WHEN  ('STU:Zip') ('All Files')
+
+%DOSMask DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('*.*')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('*.*')
+WHEN  ('STU:Address2') ('*.*')
+WHEN  ('STU:City') ('*.*')
+WHEN  ('STU:FirstName') ('*.*')
+WHEN  ('STU:GradYear') ('*.*')
+WHEN  ('STU:LastName') ('*.*')
+WHEN  ('STU:State') ('*.*')
+WHEN  ('STU:Telephone') ('*.*')
+WHEN  ('STU:Zip') ('*.*')
+
+%DOSMoreMasks DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%DOSMoreMaskDesc DEPEND %DOSMoreMasks DEFAULT TIMES 0
+
+%DOSMoreMask DEPEND %DOSMoreMasks DEFAULT TIMES 0
+
+%EditInPlaceFEQForegroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%EditInPlaceFEQBackgroundNormal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%EditInPlaceFEQForegroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%EditInPlaceFEQBackgroundSelected DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (-1)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (-1)
+WHEN  ('STU:Address2') (-1)
+WHEN  ('STU:City') (-1)
+WHEN  ('STU:FirstName') (-1)
+WHEN  ('STU:GradYear') (-1)
+WHEN  ('STU:LastName') (-1)
+WHEN  ('STU:State') (-1)
+WHEN  ('STU:Telephone') (-1)
+WHEN  ('STU:Zip') (-1)
+
+%EditInPlaceFEQFrom DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQColumnFrom DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQPicture DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQListFormat DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQDrop DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQWidth DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQCase DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Default')
+WHEN  ('STU:Address2') ('Default')
+WHEN  ('STU:City') ('Default')
+WHEN  ('STU:FirstName') ('Default')
+WHEN  ('STU:GradYear') ('Default')
+WHEN  ('STU:LastName') ('Default')
+WHEN  ('STU:State') ('Default')
+WHEN  ('STU:Telephone') ('Default')
+WHEN  ('STU:Zip') ('Default')
+
+%EditInPlaceFEQFlat DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQHorizontal DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQVertical DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQImmediate DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%EditInPlaceFEQEntryCompletion DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%LookupAssign DEPEND %Control DEPEND %ControlField MULTI LONG TIMES 0
+
+%MoreTarget DEPEND %LookupAssign FIELD TIMES 0
+
+%MoreField DEPEND %LookupAssign DEFAULT TIMES 0
+
+%EditInPlaceFEQFixedDataSourceText DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQCheckJust DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Default')
+WHEN  ('STU:Address2') ('Default')
+WHEN  ('STU:City') ('Default')
+WHEN  ('STU:FirstName') ('Default')
+WHEN  ('STU:GradYear') ('Default')
+WHEN  ('STU:LastName') ('Default')
+WHEN  ('STU:State') ('Default')
+WHEN  ('STU:Telephone') ('Default')
+WHEN  ('STU:Zip') ('Default')
+
+%EditInPlaceFEQTrue DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQFalse DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQTrueLabel DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQFalseLabel DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EditInPlaceFEQEntryMode DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Default')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Default')
+WHEN  ('STU:Address2') ('Default')
+WHEN  ('STU:City') ('Default')
+WHEN  ('STU:FirstName') ('Default')
+WHEN  ('STU:GradYear') ('Default')
+WHEN  ('STU:LastName') ('Default')
+WHEN  ('STU:State') ('Default')
+WHEN  ('STU:Telephone') ('Default')
+WHEN  ('STU:Zip') ('Default')
+
+%EditInPlaceFEQLower DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQUpper DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQStep DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('0')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('0')
+WHEN  ('STU:Address2') ('0')
+WHEN  ('STU:City') ('0')
+WHEN  ('STU:FirstName') ('0')
+WHEN  ('STU:GradYear') ('0')
+WHEN  ('STU:LastName') ('0')
+WHEN  ('STU:State') ('0')
+WHEN  ('STU:Telephone') ('0')
+WHEN  ('STU:Zip') ('0')
+
+%EditInPlaceFEQPassword DEPEND %Control DEPEND %ControlField LONG TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') (0)
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') (0)
+WHEN  ('STU:Address2') (0)
+WHEN  ('STU:City') (0)
+WHEN  ('STU:FirstName') (0)
+WHEN  ('STU:GradYear') (0)
+WHEN  ('STU:LastName') (0)
+WHEN  ('STU:State') (0)
+WHEN  ('STU:Telephone') (0)
+WHEN  ('STU:Zip') (0)
+
+%LookupType DEPEND %Control DEPEND %ControlField DEFAULT TIMES 2
+WHEN  ('')TIMES 1
+WHEN  ('') ('Related Field')
+WHEN  ('?Browse:4')TIMES 9
+WHEN  ('STU:Address') ('Related Field')
+WHEN  ('STU:Address2') ('Related Field')
+WHEN  ('STU:City') ('Related Field')
+WHEN  ('STU:FirstName') ('Related Field')
+WHEN  ('STU:GradYear') ('Related Field')
+WHEN  ('STU:LastName') ('Related Field')
+WHEN  ('STU:State') ('Related Field')
+WHEN  ('STU:Telephone') ('Related Field')
+WHEN  ('STU:Zip') ('Related Field')
+
+%PostLookupKey DEPEND %Control DEPEND %ControlField KEY TIMES 0
+
+%PostLookupField DEPEND %Control DEPEND %ControlField COMPONENT TIMES 0
+
+%PostLookupFieldNoRelated DEPEND %Control DEPEND %ControlField FIELD TIMES 0
+
+%PostLookupProcedure DEPEND %Control DEPEND %ControlField PROCEDURE TIMES 0
+
+%PostLookupProcedureParameters DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%PostLookupProcedureReturnValue DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%EIPThisObjectName DEPEND %Control DEPEND %ControlField DEFAULT TIMES 0
+
+%UpdateProcedureParameters DEFAULT  ('')
+[ADDITION]
+NAME Clarion SaveButton
+[INSTANCE]
+INSTANCE 6
+PROCPROP
+[PROMPTS]
+%InsertAllowed LONG  (1)
+%InsertMessage DEFAULT  ('Adding a Majors Record')
+%ChangeAllowed LONG  (1)
+%ChangeMessage DEFAULT  ('Changing a Majors Record')
+%DeleteAllowed LONG  (1)
+%DeleteMessage DEFAULT  ('Deleting a Majors Record')
+%MessageHeader LONG  (0)
+%ActionOnDelete DEFAULT  ('Standard Warning')
+%PrimingFields MULTI LONG  ()
+%PrimedField DEPEND %PrimingFields FIELD TIMES 0
+
+%PrimedValue DEPEND %PrimingFields DEFAULT TIMES 0
+
+%ActionOnCancel DEFAULT  ('Confirm Cancel')
+%MessageLocation DEFAULT  ('Title Bar')
+%MessageStatusSection DEFAULT  ('0')
+%AppendToTitle LONG  (0)
+%AppendToTitleID DEFAULT  ('')
+%AfterGoodInsert DEFAULT  ('Insert another record')
+%AskAfterAdd LONG  (1)
+%HistoryKey DEFAULT  ('734')
+%ViewMessage DEFAULT  ('View Record')
+[ADDITION]
+NAME Clarion FormVCRControls
+[INSTANCE]
+INSTANCE 8
+PARENT 6
+[ADDITION]
+NAME Clarion CancelButton
+[INSTANCE]
+INSTANCE 7
+[WINDOW]
+QuickWindow WINDOW('Update the Majors File'),AT(,,159,138),FONT('MS Sans Serif',8,COLOR:Black), |
+          GRAY,IMM,MDI,HLP('~UpdateMajors'),SYSTEM
+          SHEET,AT(4,4,151,112),USE(?CurrentTab),#ORIG(CurrentTab)
+            TAB('General')
+              PROMPT('&Description:'),AT(8,20),USE(?MAJ:Description:Prompt),#LINK(?MAJ:Description), |
+                #ORIG(?MAJ:Description:Prompt)
+              ENTRY(@S20),AT(64,20,84,10),USE(MAJ:Description),#LINK(?MAJ:Description:Prompt), |
+                #ORIG(MAJ:Description)
+            END
+            TAB('Teachers'),USE(?TeachersTab)
+              LIST,AT(8,20,143,94),USE(?Browse:2),HVSCROLL,FORMAT('80L(2)|M~First Name~' & |
+                'L(2)@S20@80L(2)|M~Last Name~L(2)@S20@80L(2)|M~Address~L(2)@S20@80L(2)|' & |
+                'M~City~L(2)@S20@24L(2)|M~State~L(2)@S2@24R(2)|M~Zip~C(0)@n05@52L(2)|M~' & |
+                'Telephone~L(2)@s12@'),FROM(Queue:Browse:2),IMM,MSG('Browsing Records'),#FIELDS(TEA:FirstName, |
+                TEA:LastName,TEA:Address,TEA:City,TEA:State,TEA:Zip,TEA:Telephone),#ORIG(?List), |
+                #SEQ(2)
+              BUTTON('&Insert'),AT(8,98,45,14),USE(?Insert:3),HIDE,#LINK(?Change:3),#ORIG(?Insert), |
+                #SEQ(3)
+              BUTTON('&Change'),AT(57,98,45,14),USE(?Change:3),HIDE,#LINK(?Delete:3),#ORIG(?Change), |
+                #SEQ(3)
+              BUTTON('&Delete'),AT(106,98,45,14),USE(?Delete:3),HIDE,#LINK(?Insert:3),#ORIG(?Delete), |
+                #SEQ(3)
+            END
+            TAB('Students'),USE(?StudentsTab)
+              LIST,AT(8,20,143,94),USE(?Browse:4),HVSCROLL,FORMAT('80L(2)|M~First Name~' & |
+                'L(2)@S20@80L(2)|M~Last Name~L(2)@S20@80L(2)|M~Address~L(2)@S20@80L(2)|' & |
+                'M~Address 2~L(2)@s20@80L(2)|M~City~L(2)@S20@24L(2)|M~State~L(2)@S2@24R' & |
+                '(2)|M~Zip~C(0)@n05@52L(2)|M~Telephone~L(2)@s12@40R(2)|M~Grad Year~C(0)@n4@'), |
+                FROM(Queue:Browse:4),IMM,MSG('Browsing Records'),#FIELDS(STU:FirstName,STU:LastName, |
+                STU:Address,STU:Address2,STU:City,STU:State,STU:Zip,STU:Telephone,STU:GradYear), |
+                #ORIG(?List),#SEQ(4)
+              BUTTON('&Insert'),AT(8,98,45,14),USE(?Insert:5),HIDE,#LINK(?Change:5),#ORIG(?Insert), |
+                #SEQ(5)
+              BUTTON('&Change'),AT(57,98,45,14),USE(?Change:5),HIDE,#LINK(?Delete:5),#ORIG(?Change), |
+                #SEQ(5)
+              BUTTON('&Delete'),AT(106,98,45,14),USE(?Delete:5),HIDE,#LINK(?Insert:5),#ORIG(?Delete), |
+                #SEQ(5)
+            END
+          END
+          BUTTON('OK'),AT(12,120,45,14),USE(?OK),DEFAULT,#ORIG(?OK),#SEQ(6)
+          BUTTON('Cancel'),AT(61,120,45,14),USE(?Cancel),#ORIG(?Cancel),#SEQ(7)
+          BUTTON('Help'),AT(110,120,45,14),USE(?Help),STD(STD:Help)
+        END
+
