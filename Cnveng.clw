@@ -8,6 +8,7 @@
 !-------------------------------------------------------------------------------------------------
 ! 2022-11-07  C. Barnes     Change Help HLP to CHM. All HLP('~xxx') added '.htm' to open CHM topic.
 ! 2022-11-08  C. Barnes     Window Cosmetics - Change font to Microsoft Sans Serif - adjust controls
+! 2022-11-14  C. Barnes     Rules were limited to 18 per DLL and 32 total, now 128 for both although Window will need to be resized by user at runtime
 !-------------------------------------------------------------------------------------------------
 
                     PROGRAM
@@ -224,7 +225,8 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
 
 ChangedPage             BYTE(False)
 Completed               BYTE(False)
-ComboUse                STRING(9),DIM(32),AUTO                  !Use variables for selection combos - NOTE LIMIT of 32 concurrent addins
+ComboUse                STRING(9),DIM(128),AUTO                 !Use variables for selection combos - NOTE LIMIT of 128 concurrent addins
+ComboMaxYPos            LONG                                    !22-14-11 Carl: Combo may not be visilke so tell user
 ConfirmClose            BYTE(True)
 i                       USHORT,AUTO
 OwnerMap                OwnerMapType                            !Maps Owners <==> TabFeq's
@@ -271,7 +273,9 @@ Height                      SHORT
 AfterINI                LIKE(BeforeINI),AUTO
 ButtonXPos              USHORT,AUTO
 ButtonYPos              USHORT,AUTO
-
+AddnPerCol BYTE,AUTO
+AddnColNo  BYTE,AUTO
+AddnRowNo  BYTE,AUTO
     CODE
         IF PARENT.Init() THEN RETURN LEVEL:Notify.
         SELF.ControlsCreated = False
@@ -318,11 +322,12 @@ ButtonYPos              USHORT,AUTO
             DO AssignWindowSize
             OwnerMap.Combos += 1
 
-!Current window allows 2 columns x 9 = 18 rules. There are 17 rules already so room for just 1 more before Assert
-!TODO make Window Bigger so can at least have 3 columns x 9 = 27 rules.
-!Alternative change to a LIST with all the Rules so can be of any length and none of the tricky stuff
-            IF NOT (OwnerMap.Combos <= 18) THEN Message('User Interface ThisWindow.Init()||18 Maximum Rules Combos fit on the wizard tab.','CnvEng.clw').  !Carl Since Assert is failing show message. 
-            ASSERT(OwnerMap.Combos <= 18)
+!Current window allows 2 columns x 9 = 18 rules. There are 17 rules already so room for just 1 more before ASSERT
+!22-14-11 Carl: Code 30+ lines below ignores the 18 limit and does unlimited columns
+!               Window will need to be resized at runtime. TODO warn if not big enough to be visible
+!Alternative change to a LIST with all the Rules so can be of any length and none of the tricky stuff, BUT a lot of work and this works
+            IF NOT (OwnerMap.Combos <= 128) THEN Message('User Interface ThisWindow.Init()||128 Maximum Rules are allowed.','CnvEng.clw').  !Carl Since Assert is failing show message. 
+            ASSERT(OwnerMap.Combos  <= 128)
 
             CREATE(PromptFeq + i - 1,CREATE:Prompt,OwnerMap.TabID)
             (PromptFeq + i - 1){PROP:Text} = Addins.Info.PromptText
@@ -345,14 +350,24 @@ ButtonYPos              USHORT,AUTO
             ASSERT(~ERRORCODE())
             PUT(OwnerMap)
             ASSERT(~ERRORCODE())
-            IF OwnerMap.Combos <= 9
-                XPos = 128
-                YPos = 38 + ((OwnerMap.Combos - 1) * 16)
-            ELSE
-                XPos = 276
-                YPos = 38 + ((OwnerMap.Combos - 10) * 16)
-            END
-            
+
+!22-11-14 Carl: Below original code had limit of 18 rules as 2 columns x 9 rows
+!            IF OwnerMap.Combos <= 9
+!                XPos = 128
+!                YPos = 38 + ((OwnerMap.Combos - 1) * 16)
+!            ELSE
+!                XPos = 276
+!                YPos = 38 + ((OwnerMap.Combos - 10) * 16)
+!            END
+
+!22-11-14 Carl: New  put 9 per row with unlimited columns, user must resize window at runtime
+            AddnPerCol = 9                                                  !22-11-14 Carl Barnes: Change this to 6 to test as 3 columns
+!!!         AddnPerCol = 6  !To see 3 columns set =6 to test with 17 rules 22-11-14
+            AddnColNo = INT((OwnerMap.Combos - 1) / AddnPerCol ) + 1        !22-11-14 Carl What Column will this control be in at 9 per 
+            AddnRowNo = (OwnerMap.Combos - 1) % AddnPerCol + 1              !22-11-14 Carl What Row will this control be in 1 to 9
+            XPos = 128 + (AddnColNo - 1) * (276-128)                        !Original was Col 1 and 2 at YPos 128 and 276 so (276-128)=148
+            YPos = 38  + (AddnRowNo - 1) * 16                               !Original had Rows every 16 DLUs
+                                         
             SETPOSITION(PromptFeq + i - 1,XPos,YPos)
             UNHIDE(PromptFeq + i - 1)
            ! UPDATE(ComboFeq + i - 1)
@@ -360,6 +375,9 @@ ButtonYPos              USHORT,AUTO
             SETPOSITION(ComboFeq + i - 1,XPos + 70,YPos - 5,55,12)
             UNHIDE(ComboFeq + i - 1)
             
+            IF ComboMaxYPos < XPos + 70 + 55 THEN                          !22-11-14 Carl Barnes: to warn to resize window
+               ComboMaxYPos = XPos + 70 + 55
+            END 
         END
         Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)
         Resizer.SetStrategy(?Line1,Resize:LockXPos+Resize:LockYPos,Resize:LockHeight+Resize:ConstantRight)
@@ -496,7 +514,10 @@ Fnd                             BYTE(False)
             HIDE(?Next)
             SELECT(OwnerMap.TabID)
             ?Cancel{PROP:Text} = Translator.TranslateString('&Ok')
-            ?Cancel{PROP:Tip} = Translator.TranslateString('Confirm rule setting Ok')
+            ?Cancel{PROP:Tip} = Translator.TranslateString('Confirm rule setting Ok')            
+            IF 0{PROP:Width} < ComboMaxYPos THEN                          !22-11-14 Carl Barnes
+               Message('Resize the window wider to see all rules.','Rules')
+            END             
         OF ?SetAllRulesBtn 
             DO SetAllRulesBtnRtn    !22-11-11 Carl Barnes:
         OF ?Next
