@@ -19,7 +19,10 @@
     <check_stack>True</check_stack>
     <check_index>True</check_index>
     <GenerateMap>True</GenerateMap>
-    <line_numbers>False</line_numbers>
+    <line_numbers>True</line_numbers>
+    <warnings>on</warnings>
+    <dynamic_base>False</dynamic_base>
+    <dep>True</dep>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>False</DebugSymbols>
@@ -30,7 +33,8 @@
     <warnings>on</warnings>
     <GenerateMap>True</GenerateMap>
     <line_numbers>False</line_numbers>
-    <dynamic_base>True</dynamic_base>
+    <warnings>on</warnings>
+    <dynamic_base>False</dynamic_base>
     <dep>True</dep>
   </PropertyGroup>
   <ItemGroup>

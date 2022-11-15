@@ -188,6 +188,7 @@ Replace               PROCEDURE(*CSTRING TargetStr,STRING FindStr,STRING Replace
 RestoreComment        PROCEDURE(*CSTRING)
 SaveComment           PROCEDURE(*CSTRING Txt),USHORT
 TakeSection           PROCEDURE(SectionClass SecQMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+Trace                 PROCEDURE(STRING DebugMessage)  !OutputDebugString
 WildInstring          PROCEDURE(STRING LookFor,STRING Str,*? StartPos,*? Length),BYTE
 WildReplace           PROCEDURE(*CSTRING TargetStr,STRING FindStr,STRING ReplaceStr,BYTE ReplaceAll=True),BYTE,PROC
 WildReplace           PROCEDURE(*CSTRING TargetStr,ReplaceBlockItems,SectionClass SectionMgr,InfoTextClass Info,LONG LineNo)
