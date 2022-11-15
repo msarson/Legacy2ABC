@@ -19,18 +19,18 @@
     <check_stack>True</check_stack>
     <check_index>True</check_index>
     <GenerateMap>True</GenerateMap>
-    <line_numbers>False</line_numbers>
+    <line_numbers>True</line_numbers>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>
-    <vid>off</vid>
-    <check_stack>False</check_stack>
-    <check_index>False</check_index>
+    <vid>full</vid>
+    <check_stack>True</check_stack>
+    <check_index>True</check_index>
     <warnings>on</warnings>
     <GenerateMap>True</GenerateMap>
-    <line_numbers>False</line_numbers>
-    <dynamic_base>True</dynamic_base>
+    <line_numbers>True</line_numbers>
+    <dynamic_base>False</dynamic_base>
     <dep>True</dep>
   </PropertyGroup>
   <ItemGroup>

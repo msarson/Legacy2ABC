@@ -10,6 +10,8 @@
     <cpu>386</cpu>
     <ApplicationIcon>Cwconv.ico</ApplicationIcon>
     <DefineConstants>_ABCLinkMode_=&gt;0%3b_ABCDllMode_=&gt;1</DefineConstants>
+    <stack_size>16384</stack_size>
+    <CopyCore>True</CopyCore>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>True</DebugSymbols>
@@ -17,6 +19,12 @@
     <vid>full</vid>
     <check_stack>True</check_stack>
     <check_index>True</check_index>
+    <warnings>on</warnings>
+    <GenerateMap>True</GenerateMap>
+    <line_numbers>True</line_numbers>
+    <warnings>on</warnings>
+    <dynamic_base>False</dynamic_base>
+    <dep>True</dep>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>False</DebugSymbols>
@@ -24,6 +32,9 @@
     <vid>off</vid>
     <check_stack>False</check_stack>
     <check_index>False</check_index>
+    <warnings>on</warnings>
+    <dynamic_base>False</dynamic_base>
+    <dep>True</dep>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="Cnveng.cwproj">
