@@ -6,9 +6,10 @@
 !-------------------------------------------------------------------------------------------------
 ! History 
 !-------------------------------------------------------------------------------------------------
-! 2022-11-07  C. Barnes     Change Help HLP to CHM. All HLP('~xxx') added '.htm' to open CHM topic.
-! 2022-11-08  C. Barnes     Window Cosmetics - Change font to Microsoft Sans Serif - adjust controls
-! 2022-11-14  C. Barnes     Rules were limited to 18 per DLL and 32 total, now 128 for both although Window will need to be resized by user at runtime
+! 2022-11-07  Carl B.       Change Help HLP to CHM. All HLP('~xxx') added '.htm' to open CHM topic.
+! 2022-11-08  Carl B.       Window Cosmetics - Change font to Microsoft Sans Serif - adjust controls
+! 2022-11-14  Carl B.       Rules were limited to 18 per DLL and 32 total, now 128 for both although Window will need to be resized by user at runtime
+! 2022-11-16  Carl B.       Change VIRTUAL to DERIVED for inherited/derived classes so compiler checks signature matches. Destructors added VIRTUAL
 !-------------------------------------------------------------------------------------------------
 
                     PROGRAM
@@ -236,11 +237,11 @@ Resizer                 WindowResizeClass
 
 ThisWindow              CLASS(WindowManager)
 ControlsCreated             BYTE,PRIVATE
-Init                        PROCEDURE(),BYTE,VIRTUAL
-Kill                        PROCEDURE(),BYTE,VIRTUAL,PROC
-TakeAccepted                PROCEDURE(),VIRTUAL,BYTE,PROC
-TakeCloseEvent              PROCEDURE(),VIRTUAL,BYTE,PROC
-TakeWindowEvent             PROCEDURE(),VIRTUAL,BYTE,PROC
+Init                        PROCEDURE(),BYTE,DERIVED
+Kill                        PROCEDURE(),BYTE,DERIVED,PROC
+TakeAccepted                PROCEDURE(),DERIVED,BYTE,PROC
+TakeCloseEvent              PROCEDURE(),DERIVED,BYTE,PROC
+TakeWindowEvent             PROCEDURE(),DERIVED,BYTE,PROC
                         END
 
     CODE
@@ -933,12 +934,12 @@ Popup                   PopupClass
 Resizer                 WindowResizeClass
 RVal                    BYTE(Action:Cancel)
 ThisWindow              CLASS(WindowManager)
-Ask                         PROCEDURE,VIRTUAL
-Init                        PROCEDURE,BYTE,VIRTUAL
-Kill                        PROCEDURE,BYTE,VIRTUAL,PROC
-TakeEvent                   PROCEDURE,VIRTUAL,BYTE
-TakeFieldEvent              PROCEDURE,VIRTUAL,BYTE
-TakeAccepted                PROCEDURE,VIRTUAL,BYTE,PROC
+Ask                         PROCEDURE,DERIVED
+Init                        PROCEDURE,BYTE,DERIVED
+Kill                        PROCEDURE,BYTE,DERIVED,PROC
+TakeEvent                   PROCEDURE,DERIVED,BYTE
+TakeFieldEvent              PROCEDURE,DERIVED,BYTE
+TakeAccepted                PROCEDURE,DERIVED,BYTE,PROC
                         END
 
     CODE
