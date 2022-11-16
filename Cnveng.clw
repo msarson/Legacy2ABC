@@ -216,7 +216,7 @@ Window                  WINDOW('Clarion Legacy to ABC Application Conversion Wiz
                             END
                             STRING('xxxx'), AT(4,188,416,10), USE(?PassString), HIDE, TRN
                             STRING('xxx'), AT(326,188,92,10), USE(?VersionString), TRN, RIGHT
-                            BUTTON('Set All...'), AT(120,198,46,15), USE(?SetAllRulesBtn),HIDE,TIP('Set All Conversion Rules <13,10>the same: None, Manual or Automatic')
+                            BUTTON('Set All...'), AT(120,198,46,15), USE(?SetAllRulesBtn),HIDE,TIP('Set All Conversion Rules the same: None, Manual or Automatic<13,10>Can also Right-Click on Tab.')
                             BUTTON('<< &Back'), AT(230,198,46,15), USE(?Previous), DISABLE, TIP('Previous Page')
                             BUTTON('&Next  >'), AT(276,198,46,15), USE(?Next), DEFAULT, TIP('Next Page')
                             BUTTON('&Cancel'), AT(326,198,46,15), USE(?Cancel), TIP('Exit conversion wizard')
@@ -425,7 +425,7 @@ AddnRowNo  BYTE,AUTO
 ThisWindow.TakeCloseEvent   PROCEDURE()
     CODE
         IF PARENT.TakeCloseEvent() THEN RETURN LEVEL:Notify.
-        IF ConfirmClose AND MESSAGE(Translator.TranslateString('Are you sure that you wish to quit?'),Translator.TranslateString('Confirm Exit'),ICON:Question,BUTTON:Yes+BUTTON:No,BUTTON:Yes) = BUTTON:No
+        IF ConfirmClose AND SheetPage > 2 AND MESSAGE(Translator.TranslateString('Are you sure that you wish to quit?'),Translator.TranslateString('Confirm Exit'),ICON:Question,BUTTON:Yes+BUTTON:No,BUTTON:Yes) = BUTTON:No
             RETURN LEVEL:Notify
         END
         INI.Update('MainWindow',Window)
@@ -446,8 +446,13 @@ ModeStr                         CSTRING(10),AUTO
                 ASSERT(~ERRORCODE())
             END
         OF EVENT:AlertKey
-            IF PARENT.TakeWindowEvent() THEN RETURN LEVEL:Notify.
-            IF KEYCODE() = MouseRight AND INRANGE(MOUSEX() - ?SheetPage{PROP:XPos},0,?SheetPage{PROP:Width}) AND INRANGE(MOUSEY() - ?SheetPage{PROP:YPos},0,?SheetPage{PROP:Height}) AND (SheetPage > 5 OR SheetPage = 3)
+           IF PARENT.TakeWindowEvent() THEN RETURN LEVEL:Notify.
+!22-11-15 Carl was:  IF KEYCODE() = MouseRight AND INRANGE(MOUSEX() - ?SheetPage{PROP:XPos},0,?SheetPage{PROP:Width}) AND INRANGE(MOUSEY() - ?SheetPage{PROP:YPos},0,?SheetPage{PROP:Height}) AND (SheetPage > 5 OR SheetPage = 3)
+           IF BAND(KEYCODE(),MouseRight)=MouseRight AND (SheetPage > 5 OR SheetPage = 3)       !Right Mouse click when Rule Buttons (3) or Rule Combos (>5) sheet page is active
+              IF KEYCODE()=CtrlShiftMouseRight |                                               !22-11-15 Carl Barnes: "Set All Rules" button posts with Ctrl+Shift so avoid Mouse X/Y in range check
+              OR (  INRANGE(MOUSEX() - ?SheetPage{PROP:XPos},0,?SheetPage{PROP:Width})   |     !Check if Mouse click over Sheet not elsewhere
+                AND INRANGE(MOUSEY() - ?SheetPage{PROP:YPos},0,?SheetPage{PROP:Height})  ) THEN
+                SETKEYCODE(0)
                 PopupMgr.AddMenu('All Manual|All Automatic|All None')
                 IF PopupMgr.Ask()
                     CASE PopupMgr.GetLastSelection()
@@ -467,7 +472,7 @@ ModeStr                         CSTRING(10),AUTO
                             IF ~Addins.Info.AllowAuto AND ModeStr = 'Automatic'
                                 IF Addins.TabFeq = OwnerMap.TabID THEN ComboUse[i] = 'Manual'.
                             ELSE
-                                IF Addins.TabFeq=OwnerMap.TabID THEN ComboUse[i] = ModeStr.
+                                IF Addins.TabFeq = OwnerMap.TabID THEN ComboUse[i] = ModeStr.
                             END
                         ELSIF SheetPage = 3
                             IF ~Addins.Info.AllowAuto AND ModeStr = 'Automatic'
@@ -479,7 +484,8 @@ ModeStr                         CSTRING(10),AUTO
                     END
                     DISPLAY()
                 END
-            END
+              END !If SetAllRules or Mouse over Sheet
+           END    !If Mouse Right and Wizard on Rules
         OF EVENT:GainFocus
             IF SELF.ControlsCreated                                     !only process GainFocus Events after dynamic controls have been created
                 IF PARENT.TakeWindowEvent() THEN RETURN Level:Notify.
@@ -518,8 +524,9 @@ Fnd                             BYTE(False)
             IF 0{PROP:Width} < ComboMaxYPos THEN                          !22-11-14 Carl Barnes
                Message('Resize the window wider to see all rules.','Rules')
             END             
-        OF ?SetAllRulesBtn 
-            DO SetAllRulesBtnRtn    !22-11-11 Carl Barnes:
+        OF ?SetAllRulesBtn
+            SETKEYCODE(CtrlShiftMouseRight) ; POST(EVENT:AlertKey)   !22-11-15 Carl Barnes: Kludge reuse Right click popup with my more obvious button
+
         OF ?Next
             DO ValidateSheet
             ChangedPage = True
@@ -568,23 +575,6 @@ Fnd                             BYTE(False)
             IF ConfigAppNames(AppNameIn,AppNameOut,1) = LEVEL:Notify THEN DISPLAY(?AppNameOut).
         END
         RETURN PARENT.TakeAccepted()
-
-SetAllRulesBtnRtn ROUTINE   !22-11-11 Carl Barnes: TO make easier to develop allow change All Rules
-    DATA
-RuleHow BYTE
-    CODE
-    RuleHow=POPUP('None|Manual|Automatic')
-    IF ~RuleHow THEN EXIT.
-    DB('SetAllRulesBtnRtn Addins=' & RECORDS(Addins) &'   OwnerMap.Owner=' & OwnerMap.Owner  )
-    LOOP i = 1 TO RECORDS(Addins)
-         GET(Addins,i) 
-         DB('Addins #' & i &' - '& Addins.Info.PromptText &'  ComboUseIdx='& Addins.ComboUseIdx  &'  Visible='& Addins.ComboUseIdx{PROP:Visible} &' AddIn Owner='& Addins.Info.Owner   )
-         IF Addins.Info.Owner <> OwnerMap.Owner THEN CYCLE.     !These rules are not showing
-         IF ~Addins.Info.AllowAuto AND RuleHow=3 THEN CYCLE.
-         ComboUse[i] = CHOOSE(RuleHow,'None','Manual','Automatic')
-    END
-    DISPLAY     
-    EXIT
 
 UpdateOnNewPage     ROUTINE
     IF INRANGE(SheetPage,1,5) THEN ?Image1{PROP:Text} = GetBMPName(SheetPage).
