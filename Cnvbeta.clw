@@ -13,17 +13,17 @@ OwnerName       EQUATE('Clarion 4 Betas')
 
 ConvertC4B1     CLASS(RuleClass)
 Construct         PROCEDURE
-TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                 END
 
 RemoveSymbols   CLASS(RuleClass)
 Construct         PROCEDURE
-TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                 END
 
 UpdateSymbols   CLASS(RuleClass)
 Construct         PROCEDURE
-TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection       FUNCTION(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                 END
 
 
@@ -103,7 +103,7 @@ j USHORT,AUTO
     SectionMgr.GetLine(i,cLine)
     IF SELF.PreFilterLine(cLine,'.Q.') AND SELF.SaveComment(cLine)
       LOOP j=1 TO LEN(cLine)
-        IF cLine[j]='_' THEN cLine[j]=':'.
+        IF cLine[j]='_' THEN cLine[j]=':'.    !Carl FYI: It appears C4 Beta used "_" in browse fields, now uses ":"
       END
       IF SectionMgr.LineChanged(i,cLine)
         SELF.RestoreComment(cLine)

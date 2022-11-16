@@ -4,6 +4,12 @@
 !Open sourced by kind permission of Robert Zaunere
 !In Memory of Russell Eggen
 
+!-------------------------------------------------------------------------------------------------
+! History 
+!-------------------------------------------------------------------------------------------------
+! 2022-11-16  Carl B.       Change VIRTUAL to DERIVED for inherited/derived classes so compiler checks signature matches. Destructors added VIRTUAL
+!
+!-------------------------------------------------------------------------------------------------
 
                     MEMBER()
 
@@ -35,98 +41,98 @@ Referenced            BYTE
 
 AscViewer           CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 BadLocals           CLASS(RuleClass)
 State                 BYTE,PRIVATE
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 BrowseFormula       CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 BrwRoutine          CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 BrwQueue            CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 BrwFeq              CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
 VirtualFeqCheck       PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING FeqLabel,STRING Replacement,*CSTRING cLine,LONG LineNo)
                     END
 
 Hints               CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 UnTerminatedOmits   CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
 TerminatorFound       PROCEDURE(SectionClass SectionMgr,STRING LookFor,LONG StartLine),BYTE
                     END
 
 StdFunc             CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 TBarEqu             CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 WinRoutine          CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 RepRoutine          CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 ProcRoutine         CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 FileAccess          CLASS(RuleClass)
 lDev                  SHORT
 
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
 ReplaceFcall          PROCEDURE(*CSTRING cLine,LONG i,STRING Func,STRING NewFunc,SectionClass SectionMgr, InfoTextClass Info)
                     END
 
 ChangeTplChain      CLASS(RuleCLass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 UnLinkedProc        CLASS(RuleClass)
 ThisProcedure         CSTRING(64),PRIVATE
 UnLinked              &UnLinkedQ,PRIVATE
 
-BeforeConversion      PROCEDURE,VIRTUAL
+BeforeConversion      PROCEDURE,DERIVED
 Construct             PROCEDURE()
-Destruct              PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+Destruct              PROCEDURE(),VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 RptDetailUse        CLASS(RuleClass)
 Construct             PROCEDURE()
-TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,VIRTUAL
+TakeSection           PROCEDURE(SectionClass SectionMgr,InfoTextClass Info,STRING SectionHeader),BYTE,DERIVED
                     END
 
 InitializeDLL       PROCEDURE()

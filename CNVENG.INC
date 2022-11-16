@@ -174,7 +174,7 @@ Width                   SHORT
 Height                  SHORT
                       END
 Construct             PROCEDURE(),PRIVATE
-Destruct              PROCEDURE(),PRIVATE
+Destruct              PROCEDURE(),PRIVATE,VIRTUAL
 AfterConversion       PROCEDURE(),VIRTUAL               !Called in Rule priority sequence after full conversion
 BeforeConversion      PROCEDURE(),VIRTUAL               !Called in Rule priority sequence before any conversion
 CurrentAddition       PROCEDURE(),STRING
@@ -235,7 +235,7 @@ InTXAClass          CLASS(FileManager),TYPE,MODULE('CNVENG.CLW')
 FileSize              LONG,PRIVATE
 Line                  &STRING,PRIVATE
 Init                  PROCEDURE(ErrorClass ErrMgr),PRIVATE
-Kill                  PROCEDURE(),VIRTUAL,PRIVATE
+Kill                  PROCEDURE(),DERIVED,PRIVATE
 Next                  PROCEDURE(),BYTE,PROC,DERIVED
 ReadFile              PROCEDURE(ApplicationClass TXAQMgr,ProgressManagerClass Progress),BYTE,PRIVATE
                     END
@@ -243,7 +243,7 @@ ReadFile              PROCEDURE(ApplicationClass TXAQMgr,ProgressManagerClass Pr
 OutTXAClass         CLASS(FileManager),TYPE,MODULE('CNVENG.CLW')
 Line                  &STRING,PRIVATE
 Init                  PROCEDURE(ErrorClass ErrMgr),PRIVATE
-Kill                  PROCEDURE(),VIRTUAL,PRIVATE
+Kill                  PROCEDURE(),DERIVED,PRIVATE
 Update                PROCEDURE(),BYTE,PROC,DERIVED
 WriteFile             PROCEDURE(ApplicationClass TXAQMgr,ProgressManagerClass Progress),BYTE,PRIVATE
                     END
